@@ -82,7 +82,7 @@ public class ExperimentalDocumentListPresenter extends BasePresenter<DataMockSum
     @Override
     public void refreshItems() {
         view.setCurrentFilter("");
-        filterItems(view.getCurrentFilter(), view.getListGrid());
+        filterItems(view.getCurrentFilter(), view.getListGrid(),true);
         clearSearchEvent.fire(new ClearSearchEvent());
         view.setCurrentFilter("");
     }
