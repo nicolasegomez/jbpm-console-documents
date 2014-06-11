@@ -31,8 +31,8 @@
   <name>jBPM Console NG - Documents Panels</name>
 
   <modules>
-    <!--<module>jbpm-console-ng-documents-api</module>-->
+    <module>jbpm-console-ng-documents-api</module>
     <module>jbpm-console-ng-documents-client</module>
-    <!--<module>jbpm-console-ng-documents-backend</module>-->
+    <module>jbpm-console-ng-documents-backend</module>
   </modules>
 </project>
