@@ -1,9 +1,9 @@
-package org.jbpm.console.ng.documents.service;
+package org.jbpm.console.ng.dm.service;
 
 import java.util.List;
 
 import org.jboss.errai.bus.server.annotations.Remote;
-import org.jbpm.console.ng.documents.model.DocumentSummary;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
 
 @Remote
 public interface DocumentServiceEntryPoint {

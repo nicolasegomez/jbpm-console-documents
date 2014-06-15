@@ -6,8 +6,8 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.documents.model.DocumentSummary;
-import org.jbpm.console.ng.documents.service.DocumentServiceEntryPoint;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 
 @Service
 @ApplicationScoped

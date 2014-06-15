@@ -1,4 +1,4 @@
-package org.jbpm.console.ng.documents.model.events;
+package org.jbpm.console.ng.dm.model.events;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 

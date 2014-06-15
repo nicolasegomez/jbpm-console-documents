@@ -20,15 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jbpm.console.ng.documents.model.DocumentSummary;
-import org.jbpm.console.ng.documents.service.DocumentServiceEntryPoint;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 import org.jbpm.console.ng.gc.client.i18n.Constants;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -47,7 +44,7 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 
 @Dependent
-@WorkbenchScreen(identifier = "Document List")
+@WorkbenchScreen(identifier = "Documents Presenter")
 public class DocumentListPresenter {
 
 	public interface DocumentListView extends UberView<DocumentListPresenter> {
@@ -93,7 +90,7 @@ public class DocumentListPresenter {
 		makeMenuBar();
 	}
 
-	public void refreshProcessList() {
+	public void refreshDocumentList() {
 		dataServices.call(new RemoteCallback<List<DocumentSummary>>() {
 			@Override
 			public void callback(List<DocumentSummary> documents) {
@@ -126,12 +123,12 @@ public class DocumentListPresenter {
 
 	@OnOpen
 	public void onOpen() {
-		refreshProcessList();
+		refreshDocumentList();
 	}
 
 	@OnFocus
 	public void onFocus() {
-		refreshProcessList();
+		refreshDocumentList();
 	}
 
 	@WorkbenchMenu
@@ -144,9 +141,9 @@ public class DocumentListPresenter {
 				.respondsWith(new Command() {
 					@Override
 					public void execute() {
-						refreshProcessList();
+						refreshDocumentList();
 						view.setCurrentFilter("");
-						view.displayNotification("Something");
+						view.displayNotification("Refresh complete.");
 					}
 				}).endMenu().build();
 

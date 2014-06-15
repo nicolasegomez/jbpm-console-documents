@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.documents.model;
+package org.jbpm.console.ng.dm.model;
+
+import java.io.Serializable;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class DocumentSummary {
-
-    private String id;
+public class DocumentSummary implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1136756965587896092L;
+	
+	private String id;
     private String name;
     
     public DocumentSummary() {
@@ -46,6 +52,11 @@ public class DocumentSummary {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    @Override
+    public String toString() {
+        return "TaskSummary [id=" + id + ", name=" + name + "]";
     }
 
 }

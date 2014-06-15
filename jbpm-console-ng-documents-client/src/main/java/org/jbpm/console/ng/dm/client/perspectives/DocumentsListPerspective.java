@@ -35,8 +35,8 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
  * A Perspective to show File Explorer
  */
 @ApplicationScoped
-@WorkbenchPerspective(identifier = "Nicolas", isDefault = false)
-public class ExperimentalDocumentListPerspective {
+@WorkbenchPerspective(identifier = "Documents Perspective", isDefault = false)
+public class DocumentsListPerspective {
     
     
     @Inject
@@ -49,8 +49,8 @@ public class ExperimentalDocumentListPerspective {
     public PerspectiveDefinition getPerspective() {
         final PerspectiveDefinition p = new PerspectiveDefinitionImpl(PanelType.ROOT_LIST);
         p.setName("Nicolas");
-        p.getRoot().addPart(new PartDefinitionImpl(new DefaultPlaceRequest("Nicolas Presenter")));
-
+//        p.getRoot().addPart(new PartDefinitionImpl(new DefaultPlaceRequest("DocumentsList")));
+        p.getRoot().addPart(new PartDefinitionImpl(new DefaultPlaceRequest("Documents Presenter")));
         
 
         p.setTransient(true);

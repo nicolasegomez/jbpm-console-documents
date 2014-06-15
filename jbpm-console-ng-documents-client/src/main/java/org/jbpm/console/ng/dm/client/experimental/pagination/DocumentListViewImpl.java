@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.jbpm.console.ng.documents.model.DocumentSummary;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
 import org.jbpm.console.ng.gc.client.util.DataGridUtils;
 import org.jbpm.console.ng.gc.client.util.ResizableHeader;
 import org.uberfire.client.common.BusyPopup;
@@ -61,7 +61,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 
 @Dependent
-@Templated(value = "ProcessDefinitionListViewImpl.html")
+@Templated(value = "DocumentListViewImpl.html")
 public class DocumentListViewImpl extends Composite
         implements DocumentListPresenter.DocumentListView,
         RequiresResize {
@@ -192,16 +192,20 @@ public class DocumentListViewImpl extends Composite
                 return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
             }
         });
+        
         processdefListGrid.addColumn(processNameColumn, new ResizableHeader("Name", processdefListGrid,
                 processNameColumn));
 
         // Version Type
-        Column<DocumentSummary, String> versionColumn = new Column<DocumentSummary, String>(new TextCell()) {
+        Column<DocumentSummary, String> idColumn = new Column<DocumentSummary, String>(new TextCell()) {
             @Override
             public String getValue(DocumentSummary object) {
-                return object.getName();
+                return object.getId();
             }
         };
+        
+        processdefListGrid.addColumn(idColumn, new ResizableHeader("ID", processdefListGrid,
+        		idColumn));
        
     }
 
