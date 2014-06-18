@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 import org.jbpm.console.ng.gc.client.i18n.Constants;
 import org.uberfire.client.annotations.WorkbenchMenu;
@@ -55,7 +57,7 @@ public class DocumentListPresenter {
 
 		void setCurrentFilter(String filter);
 
-		DataGrid<DocumentSummary> getDataGrid();
+		DataGrid<CMSContentSummary> getDataGrid();
 
 		void showBusyIndicator(String message);
 
@@ -70,9 +72,9 @@ public class DocumentListPresenter {
 	@Inject
 	private Caller<DocumentServiceEntryPoint> dataServices;
 
-	List<DocumentSummary> currentDocuments = null;
+	List<CMSContentSummary> currentDocuments = null;
 
-	private ListDataProvider<DocumentSummary> dataProvider = new ListDataProvider<DocumentSummary>();
+	private ListDataProvider<CMSContentSummary> dataProvider = new ListDataProvider<CMSContentSummary>();
 
 	private Constants constants = GWT.create(Constants.class);
 
@@ -90,30 +92,30 @@ public class DocumentListPresenter {
 		makeMenuBar();
 	}
 
-	public void refreshDocumentList() {
-		dataServices.call(new RemoteCallback<List<DocumentSummary>>() {
+	public void refreshDocumentList(String id) {
+		dataServices.call(new RemoteCallback<List<CMSContentSummary>>() {
 			@Override
-			public void callback(List<DocumentSummary> documents) {
+			public void callback(List<CMSContentSummary> documents) {
 				currentDocuments = documents;
 				filterProcessList(view.getCurrentFilter());
 			}
-		}).getDocuments();
+		}).getDocuments(id);
 	}
 
 	public void filterProcessList(String filter) {
 
 		dataProvider.getList().clear();
 		dataProvider.getList().addAll(
-				new ArrayList<DocumentSummary>(currentDocuments));
+				new ArrayList<CMSContentSummary>(currentDocuments));
 		dataProvider.refresh();
 
 	}
 
-	public void addDataDisplay(HasData<DocumentSummary> display) {
+	public void addDataDisplay(HasData<CMSContentSummary> display) {
 		dataProvider.addDataDisplay(display);
 	}
 
-	public ListDataProvider<DocumentSummary> getDataProvider() {
+	public ListDataProvider<CMSContentSummary> getDataProvider() {
 		return dataProvider;
 	}
 
@@ -123,12 +125,12 @@ public class DocumentListPresenter {
 
 	@OnOpen
 	public void onOpen() {
-		refreshDocumentList();
+		refreshDocumentList(null);
 	}
 
 	@OnFocus
 	public void onFocus() {
-		refreshDocumentList();
+		refreshDocumentList(null);
 	}
 
 	@WorkbenchMenu
@@ -141,7 +143,7 @@ public class DocumentListPresenter {
 				.respondsWith(new Command() {
 					@Override
 					public void execute() {
-						refreshDocumentList();
+						refreshDocumentList(null);
 						view.setCurrentFilter("");
 						view.displayNotification("Refresh complete.");
 					}
@@ -149,4 +151,14 @@ public class DocumentListPresenter {
 
 	}
 
+		public void onProcessDefSelectionEvent(@Observes DocumentsListSearchEvent event){
+        
+//        view.getProcessIdText().setText( event.getProcessId() );
+//        
+//        view.getDeploymentIdText().setText( event.getDeploymentId() );
+
+			if (event.getType().equalsIgnoreCase("FOLDER")) {
+				this.refreshDocumentList(event.getFilter());
+			}
+    }
 }
