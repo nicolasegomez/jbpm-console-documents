@@ -29,8 +29,6 @@ import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.gc.client.util.ResizableHeader;
 import org.uberfire.client.common.BusyPopup;
 import org.uberfire.client.mvp.PlaceManager;
-import org.uberfire.client.mvp.PlaceStatus;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.security.Identity;
 import org.uberfire.workbench.events.NotificationEvent;
 
@@ -126,8 +124,7 @@ public class DocumentListViewImpl extends Composite implements
 						Set<CMSContentSummary> selectedProcessDef = selectionModel
 								.getSelectedSet();
 						for (CMSContentSummary pd : selectedProcessDef) {
-							selectDocEvent.fire(new DocumentsListSearchEvent(pd
-									.getId(), pd.getContentType().toString()));
+							selectDocEvent.fire(new DocumentsListSearchEvent(pd));
 						}
 					}
 				});
@@ -156,25 +153,12 @@ public class DocumentListViewImpl extends Composite implements
 						if (BrowserEvents.CLICK.equalsIgnoreCase(event
 								.getNativeEvent().getType())) {
 							selectDocEvent.fire(new DocumentsListSearchEvent(
-									summary.getId(), summary.getContentType()
-											.toString()));
+									summary));
 						}
 					}
-					//
-					// if
-					// (BrowserEvents.FOCUS.equalsIgnoreCase(event.getNativeEvent().getType()))
-					// {
-					// if (DataGridUtils.newProcessDefName != null) {
-					// changeRowSelected(new
-					// ProcessDefStyleEvent(DataGridUtils.newProcessDefName,
-					// DataGridUtils.newProcessDefVersion));
-					// }
-					// }
-
-					// }
 				});
 
-		// Process Name String.
+		// Name String.
 		Column<CMSContentSummary, String> processNameColumn = new Column<CMSContentSummary, String>(
 				new TextCell()) {
 			@Override

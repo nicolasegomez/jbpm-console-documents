@@ -42,6 +42,7 @@ import org.uberfire.workbench.model.menu.Menus;
 
 import com.github.gwtbootstrap.client.ui.DataGrid;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -64,6 +65,8 @@ public class DocumentListPresenter {
 		void hideBusyIndicator();
 	}
 
+	private static String linkURL = "http://127.0.0.1:8888/documentview"; // TODO not hardcoded please!
+	
 	private Menus menus;
 
 	@Inject
@@ -151,14 +154,16 @@ public class DocumentListPresenter {
 
 	}
 
-		public void onProcessDefSelectionEvent(@Observes DocumentsListSearchEvent event){
-        
-//        view.getProcessIdText().setText( event.getProcessId() );
-//        
-//        view.getDeploymentIdText().setText( event.getDeploymentId() );
-
-			if (event.getType().equalsIgnoreCase("FOLDER")) {
-				this.refreshDocumentList(event.getFilter());
-			}
-    }
+	public void onProcessDefSelectionEvent(
+			@Observes DocumentsListSearchEvent event) {
+		if (event.getSummary().getContentType().toString()
+				.equalsIgnoreCase("FOLDER")) {
+			this.refreshDocumentList(event.getSummary().getId());
+		} else {
+			// it is a document!
+			Window.open(linkURL + "?documentId=" + event.getSummary().getId()
+					+ "&documentName=" + event.getSummary().getName(),
+					"_blank", "");
+		}
+	}
 }

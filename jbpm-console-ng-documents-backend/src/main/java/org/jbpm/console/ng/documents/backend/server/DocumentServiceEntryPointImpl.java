@@ -1,17 +1,15 @@
 package org.jbpm.console.ng.documents.backend.server;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
-import org.apache.chemistry.opencmis.client.api.Session;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.CMSContentSummary.ContentType;
@@ -35,6 +33,8 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 		    }
 		    else {
 		    	doc = new CMSContentSummary(item.getName(), item.getId(), ContentType.DOCUMENT);
+		    	Folder parent = ((Document)item).getParents().get(0); //for now, assume it only has one parent.
+		    	doc.setParent(new CMSContentSummary(parent.getName(), parent.getId(), ContentType.FOLDER));
 		    }
 		    documents.add(doc);
 		}
