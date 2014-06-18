@@ -9,5 +9,5 @@ import org.jbpm.console.ng.dm.model.CMSContentSummary;
 public interface DocumentServiceEntryPoint {
 
 	public List<CMSContentSummary> getDocuments(String path);
-    
+
 }
