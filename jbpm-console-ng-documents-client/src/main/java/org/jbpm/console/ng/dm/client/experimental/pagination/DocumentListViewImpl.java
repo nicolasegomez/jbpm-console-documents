@@ -35,9 +35,12 @@ import org.uberfire.security.Identity;
 import org.uberfire.workbench.events.NotificationEvent;
 
 import com.github.gwtbootstrap.client.ui.DataGrid;
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -72,6 +75,10 @@ public class DocumentListViewImpl extends Composite implements
 	@Inject
 	@DataField
 	public LayoutPanel listContainer;
+	
+	@Inject
+    @DataField
+    public NavLink parentLink;
 
 	@DataField
 	public SimplePager pager;
@@ -111,6 +118,23 @@ public class DocumentListViewImpl extends Composite implements
 		emptyTable.setStyleName("");
 		processdefListGrid.setEmptyTableWidget(emptyTable);
 
+		parentLink.setText("Parent ^");
+        parentLink.setStyleName("active");
+        parentLink.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+            	parentLink.setStyleName("active");
+            	CMSContentSummary summary = event.getValue();
+
+				if (BrowserEvents.CLICK.equalsIgnoreCase(event
+						.getNativeEvent().getType())) {
+					selectDocEvent.fire(new DocumentsListSearchEvent(
+							summary.getId(), summary.getContentType()
+									.toString()));
+				}
+            }
+        });
+        
 		// Attach a column sort handler to the ListDataProvider to sort the
 		// list.
 		sortHandler = new ListHandler<CMSContentSummary>(presenter

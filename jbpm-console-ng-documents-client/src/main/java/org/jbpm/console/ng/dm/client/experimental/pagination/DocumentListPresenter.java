@@ -77,6 +77,8 @@ public class DocumentListPresenter {
 	private ListDataProvider<CMSContentSummary> dataProvider = new ListDataProvider<CMSContentSummary>();
 
 	private Constants constants = GWT.create(Constants.class);
+	
+	private String currentCMSContent;
 
 	@WorkbenchPartTitle
 	public String getTitle() {
@@ -125,11 +127,13 @@ public class DocumentListPresenter {
 
 	@OnOpen
 	public void onOpen() {
+		currentCMSContent = null;
 		refreshDocumentList(null);
 	}
 
 	@OnFocus
 	public void onFocus() {
+		currentCMSContent = null;
 		refreshDocumentList(null);
 	}
 
@@ -151,14 +155,14 @@ public class DocumentListPresenter {
 
 	}
 
-		public void onProcessDefSelectionEvent(@Observes DocumentsListSearchEvent event){
-        
+	public void onProcessDefSelectionEvent(@Observes DocumentsListSearchEvent event){
 //        view.getProcessIdText().setText( event.getProcessId() );
 //        
 //        view.getDeploymentIdText().setText( event.getDeploymentId() );
 
-			if (event.getType().equalsIgnoreCase("FOLDER")) {
-				this.refreshDocumentList(event.getFilter());
-			}
+		if (event.getType().equalsIgnoreCase("FOLDER")) {
+			currentCMSContent = event.getFilter();
+			this.refreshDocumentList(event.getFilter());
+		}
     }
 }
