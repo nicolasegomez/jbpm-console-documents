@@ -1,35 +1,24 @@
 package org.jbpm.console.ng.dm.model.events;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
+import org.jbpm.console.ng.dm.model.CMSContentSummary;
 
 @Portable
 public class DocumentsListSearchEvent {
-    private String filter;
     
-    private String type;
+	private CMSContentSummary summary;
 
     public DocumentsListSearchEvent() {
     }
 
-    public DocumentsListSearchEvent(String filter, String type) {
-        this.filter = filter;
-        this.type = type;
+    public DocumentsListSearchEvent(CMSContentSummary summary) {
+        this.summary = summary;
     }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-    
-    public void setType(String type) {
-		this.type = type;
+    public CMSContentSummary getSummary() {
+		return summary;
 	}
     
-    public String getType() {
-		return type;
+    public void setSummary(CMSContentSummary summary) {
+		this.summary = summary;
 	}
-    
 }

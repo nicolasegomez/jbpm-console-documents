@@ -26,11 +26,10 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
+import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.gc.client.util.ResizableHeader;
 import org.uberfire.client.common.BusyPopup;
 import org.uberfire.client.mvp.PlaceManager;
-import org.uberfire.client.mvp.PlaceStatus;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.security.Identity;
 import org.uberfire.workbench.events.NotificationEvent;
 
@@ -85,6 +84,9 @@ public class DocumentListViewImpl extends Composite implements
 
 	@Inject
 	private Event<DocumentsListSearchEvent> selectDocEvent;
+	
+	@Inject
+	private Event<DocumentsParentSearchEvent> parentDocEvent;
 
 	@Inject
 	private Event<NotificationEvent> notification;
@@ -119,18 +121,16 @@ public class DocumentListViewImpl extends Composite implements
 		processdefListGrid.setEmptyTableWidget(emptyTable);
 
 		parentLink.setText("Parent ^");
-        parentLink.setStyleName("active");
+        parentLink.setStyleName("");
         parentLink.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
             	parentLink.setStyleName("active");
-            	CMSContentSummary summary = event.getValue();
-
+            	
 				if (BrowserEvents.CLICK.equalsIgnoreCase(event
 						.getNativeEvent().getType())) {
-					selectDocEvent.fire(new DocumentsListSearchEvent(
-							summary.getId(), summary.getContentType()
-									.toString()));
+					parentDocEvent.fire(new DocumentsParentSearchEvent());
+					parentLink.setStyleName("");
 				}
             }
         });
@@ -150,8 +150,7 @@ public class DocumentListViewImpl extends Composite implements
 						Set<CMSContentSummary> selectedProcessDef = selectionModel
 								.getSelectedSet();
 						for (CMSContentSummary pd : selectedProcessDef) {
-							selectDocEvent.fire(new DocumentsListSearchEvent(pd
-									.getId(), pd.getContentType().toString()));
+							selectDocEvent.fire(new DocumentsListSearchEvent(pd));
 						}
 					}
 				});
@@ -180,25 +179,12 @@ public class DocumentListViewImpl extends Composite implements
 						if (BrowserEvents.CLICK.equalsIgnoreCase(event
 								.getNativeEvent().getType())) {
 							selectDocEvent.fire(new DocumentsListSearchEvent(
-									summary.getId(), summary.getContentType()
-											.toString()));
+									summary));
 						}
 					}
-					//
-					// if
-					// (BrowserEvents.FOCUS.equalsIgnoreCase(event.getNativeEvent().getType()))
-					// {
-					// if (DataGridUtils.newProcessDefName != null) {
-					// changeRowSelected(new
-					// ProcessDefStyleEvent(DataGridUtils.newProcessDefName,
-					// DataGridUtils.newProcessDefVersion));
-					// }
-					// }
-
-					// }
 				});
 
-		// Process Name String.
+		// Name String.
 		Column<CMSContentSummary, String> processNameColumn = new Column<CMSContentSummary, String>(
 				new TextCell()) {
 			@Override

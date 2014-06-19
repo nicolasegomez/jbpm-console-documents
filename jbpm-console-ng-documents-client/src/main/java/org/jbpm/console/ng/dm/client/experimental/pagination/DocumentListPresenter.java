@@ -27,6 +27,7 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
+import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 import org.jbpm.console.ng.gc.client.i18n.Constants;
 import org.uberfire.client.annotations.WorkbenchMenu;
@@ -42,6 +43,7 @@ import org.uberfire.workbench.model.menu.Menus;
 
 import com.github.gwtbootstrap.client.ui.DataGrid;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -64,6 +66,8 @@ public class DocumentListPresenter {
 		void hideBusyIndicator();
 	}
 
+	private static String linkURL = "http://127.0.0.1:8888/documentview"; // TODO not hardcoded please!
+	
 	private Menus menus;
 
 	@Inject
@@ -73,12 +77,12 @@ public class DocumentListPresenter {
 	private Caller<DocumentServiceEntryPoint> dataServices;
 
 	List<CMSContentSummary> currentDocuments = null;
+	
+	CMSContentSummary currentCMSContentSummary;
 
 	private ListDataProvider<CMSContentSummary> dataProvider = new ListDataProvider<CMSContentSummary>();
 
 	private Constants constants = GWT.create(Constants.class);
-	
-	private String currentCMSContent;
 
 	@WorkbenchPartTitle
 	public String getTitle() {
@@ -127,14 +131,17 @@ public class DocumentListPresenter {
 
 	@OnOpen
 	public void onOpen() {
-		currentCMSContent = null;
+		currentCMSContentSummary = null;
 		refreshDocumentList(null);
 	}
 
 	@OnFocus
 	public void onFocus() {
-		currentCMSContent = null;
-		refreshDocumentList(null);
+		if (currentCMSContentSummary != null){
+			refreshDocumentList(currentCMSContentSummary.getId());
+		} else {
+			refreshDocumentList(null);
+		}
 	}
 
 	@WorkbenchMenu
@@ -155,14 +162,29 @@ public class DocumentListPresenter {
 
 	}
 
-	public void onProcessDefSelectionEvent(@Observes DocumentsListSearchEvent event){
-//        view.getProcessIdText().setText( event.getProcessId() );
-//        
-//        view.getDeploymentIdText().setText( event.getDeploymentId() );
-
-		if (event.getType().equalsIgnoreCase("FOLDER")) {
-			currentCMSContent = event.getFilter();
-			this.refreshDocumentList(event.getFilter());
+	public void onProcessDefSelectionEvent(
+			@Observes DocumentsListSearchEvent event) {
+		if (event.getSummary().getContentType().toString()
+				.equalsIgnoreCase("FOLDER")) {
+			currentCMSContentSummary = event.getSummary();
+			this.refreshDocumentList(event.getSummary().getId());
+		} else {
+			// it is a document!
+			Window.open(linkURL + "?documentId=" + event.getSummary().getId()
+					+ "&documentName=" + event.getSummary().getName(),
+					"_blank", "");
 		}
-    }
+	}
+	
+	public void onDocumentsParentSelectionEvent(
+			@Observes DocumentsParentSearchEvent event) {
+		if (currentCMSContentSummary != null){
+			if (currentCMSContentSummary.getParent() != null){
+				this.refreshDocumentList(currentCMSContentSummary.getParent().getId());
+			} else {
+				this.refreshDocumentList(null);
+			}
+		}
+		
+	}
 }

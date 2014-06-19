@@ -9,6 +9,8 @@ public class CMSContentSummary {
 	
 	private String id;
 	
+	private CMSContentSummary parent;
+	
 	private ContentType contentType;
 	
 	public CMSContentSummary(String name, String id, ContentType contentType) {
@@ -45,6 +47,14 @@ public class CMSContentSummary {
 		this.name = name;
 	}
 
+	public void setParent(CMSContentSummary parent) {
+		this.parent = parent;
+	}
+	
+	public CMSContentSummary getParent() {
+		return parent;
+	}
+	
 	public static enum ContentType {
 		DOCUMENT,
 		FOLDER;
