@@ -78,7 +78,15 @@ public class DocumentListViewImpl extends Composite implements
 	@Inject
     @DataField
     public NavLink parentLink;
-
+	
+	@Inject
+    @DataField
+    public NavLink homeLink;
+	
+	@Inject
+    @DataField
+    public NavLink newLink;
+	
 	@DataField
 	public SimplePager pager;
 
@@ -120,7 +128,7 @@ public class DocumentListViewImpl extends Composite implements
 		emptyTable.setStyleName("");
 		processdefListGrid.setEmptyTableWidget(emptyTable);
 
-		parentLink.setText("Parent ^");
+		parentLink.setText("Parent");
         parentLink.setStyleName("");
         parentLink.addClickHandler(new ClickHandler() {
             @Override
@@ -132,6 +140,24 @@ public class DocumentListViewImpl extends Composite implements
 					parentDocEvent.fire(new DocumentsParentSearchEvent());
 					parentLink.setStyleName("");
 				}
+            }
+        });
+        
+        homeLink.setText("Home");
+        homeLink.setStyleName("");
+        homeLink.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+            	// TODO
+            }
+        });
+        
+        newLink.setText("New");
+        newLink.setStyleName("");
+        newLink.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+            	// TODO
             }
         });
         
