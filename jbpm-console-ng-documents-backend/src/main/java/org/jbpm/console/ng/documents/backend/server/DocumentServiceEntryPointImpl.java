@@ -29,14 +29,15 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 		for (CmisObject item : children) {
 			 CMSContentSummary doc = null;
 			if (((ObjectType)item.getType()).getId().equals("cmis:folder") ){
-		    	doc = new CMSContentSummary(item.getName(), item.getId(), ContentType.FOLDER);
+				Folder folder = (Folder) item;
+		    	doc = new CMSContentSummary(item.getName(), item.getId(), ContentType.FOLDER, folder.getPath());
 		    	Folder parent = ((Folder)item).getParents().get(0); //for now, assume it only has one parent.
-		    	doc.setParent(new CMSContentSummary(parent.getName(), parent.getId(), ContentType.FOLDER));
+		    	doc.setParent(new CMSContentSummary(parent.getName(), parent.getId(), ContentType.FOLDER, parent.getPath()));
 		    }
 		    else {
-		    	doc = new CMSContentSummary(item.getName(), item.getId(), ContentType.DOCUMENT);
+		    	doc = new CMSContentSummary(item.getName(), item.getId(), ContentType.DOCUMENT, null);
 		    	Folder parent = ((Document)item).getParents().get(0); //for now, assume it only has one parent.
-		    	doc.setParent(new CMSContentSummary(parent.getName(), parent.getId(), ContentType.FOLDER));
+		    	doc.setParent(new CMSContentSummary(parent.getName(), parent.getId(), ContentType.FOLDER, parent.getPath()));
 		    }
 		    documents.add(doc);
 		}

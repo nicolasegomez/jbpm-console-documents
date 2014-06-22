@@ -7,17 +7,20 @@ public class CMSContentSummary {
 
 	private String name;
 	
+	private String path;
+	
 	private String id;
 	
 	private CMSContentSummary parent;
 	
 	private ContentType contentType;
 	
-	public CMSContentSummary(String name, String id, ContentType contentType) {
+	public CMSContentSummary(String name, String id, ContentType contentType, String path) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.contentType = contentType;
+		this.path = path;
 	}
 
 	public CMSContentSummary() {
@@ -53,6 +56,10 @@ public class CMSContentSummary {
 	
 	public CMSContentSummary getParent() {
 		return parent;
+	}
+	
+	public String getPath() {
+		return path;
 	}
 	
 	public static enum ContentType {

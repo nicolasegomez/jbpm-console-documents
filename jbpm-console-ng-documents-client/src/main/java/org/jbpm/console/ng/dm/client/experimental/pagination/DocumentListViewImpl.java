@@ -42,6 +42,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -78,6 +79,10 @@ public class DocumentListViewImpl extends Composite implements
 	@Inject
     @DataField
     public NavLink parentLink;
+	
+	@Inject
+    @DataField
+    public Anchor pathLink;
 	
 	@Inject
     @DataField
@@ -118,7 +123,7 @@ public class DocumentListViewImpl extends Composite implements
 	@Override
 	public void init(final DocumentListPresenter presenter) {
 		this.presenter = presenter;
-
+		this.pathLink.setText("/");
 		listContainer.add(processdefListGrid);
 		pager.setDisplay(processdefListGrid);
 		pager.setPageSize(10);
@@ -139,6 +144,7 @@ public class DocumentListViewImpl extends Composite implements
 						.getNativeEvent().getType())) {
 					parentDocEvent.fire(new DocumentsParentSearchEvent());
 					parentLink.setStyleName("");
+					pathLink.setText(presenter.currentCMSContentSummary.getParent().getPath());
 				}
             }
         });
@@ -206,6 +212,7 @@ public class DocumentListViewImpl extends Composite implements
 								.getNativeEvent().getType())) {
 							selectDocEvent.fire(new DocumentsListSearchEvent(
 									summary));
+							pathLink.setText(summary.getPath());
 						}
 					}
 				});

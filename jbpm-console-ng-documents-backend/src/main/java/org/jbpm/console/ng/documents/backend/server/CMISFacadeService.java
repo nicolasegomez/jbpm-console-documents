@@ -25,13 +25,16 @@ import org.jboss.errai.bus.server.annotations.Service;
 @ApplicationScoped
 public class CMISFacadeService implements CMISFacade {
 
+	private Session session;
+	
 	/* (non-Javadoc)
 	 * @see org.jbpm.console.ng.documents.backend.server.CMISFacade#getChildren(java.lang.String)
 	 */
 	@Override
 	public List<CmisObject> getChildren(String id) {
-
-		Session session = this.createSession();
+		if (session == null) {
+			session = this.createSession();
+		}
 		Folder folder = null;
 		if (id == null || id.isEmpty()) {
 			folder = session.getRootFolder();
