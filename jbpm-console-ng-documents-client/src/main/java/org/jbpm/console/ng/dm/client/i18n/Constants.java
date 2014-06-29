@@ -46,4 +46,12 @@ public interface Constants extends Messages {
     String Remove();
     
     String Go();
+    
+    String DocumentID();
+    
+    String DocumentName();
+    
+    String DownloadButton();
+    
+    String DownloadButtonLabel();
 }

@@ -29,6 +29,7 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentDefSelectionEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
+import org.jbpm.console.ng.dm.client.i18n.Constants;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -45,6 +46,7 @@ import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.Menus;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -76,6 +78,8 @@ public class DocumentDetailsPresenter {
 
 	@Inject
 	private PlaceManager placeManager;
+	
+	private Constants constants = GWT.create(Constants.class);
 
 	@Inject
 	private DocumentDetailsView view;

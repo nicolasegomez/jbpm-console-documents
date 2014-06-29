@@ -23,12 +23,14 @@ import javax.inject.Inject;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.jbpm.console.ng.dm.client.i18n.Constants;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.workbench.events.NotificationEvent;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Label;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -42,6 +44,8 @@ public class DocumentDetailsViewImpl extends Composite implements
 	private PlaceManager placeManager;
 
 	private DocumentDetailsPresenter presenter;
+	
+	private Constants constants = GWT.create(Constants.class);
 
 	@Inject
 	@DataField
@@ -78,10 +82,10 @@ public class DocumentDetailsViewImpl extends Composite implements
 	public void init(final DocumentDetailsPresenter presenter) {
 		this.presenter = presenter;
 
-		documentIdLabel.setText("Document ID");
-		documentNameLabel.setText("Document Name");
-		openDocumentButton.setText("Descargar");
-		documentPathLabel.setText("Document");
+		documentIdLabel.setText(constants.DocumentID());
+		documentNameLabel.setText(constants.DocumentName());
+		openDocumentButton.setText(constants.DownloadButton());
+		documentPathLabel.setText(constants.DownloadButtonLabel());
 	}
 
 	@Override
