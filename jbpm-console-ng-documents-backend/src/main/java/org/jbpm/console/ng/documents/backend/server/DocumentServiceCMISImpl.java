@@ -1,5 +1,6 @@
 package org.jbpm.console.ng.documents.backend.server;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,62 +13,26 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.bindings.spi.webservices.CXFPortProvider;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.jboss.errai.bus.server.annotations.Service;
+import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.CMSContentSummary.ContentType;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.jbpm.console.ng.dm.model.FolderSummary;
 
 @Service
 @ApplicationScoped
-public class CMISFacadeService implements CMISFacade {
+public class DocumentServiceCMISImpl implements DocumentService {
+
 
 	private Session session;
 	
-	/* (non-Javadoc)
-	 * @see org.jbpm.console.ng.documents.backend.server.CMISFacade#getChildren(java.lang.String)
-	 */
-	@Override
-	public List<CmisObject> getChildren(String id) {
-		if (session == null) {
-			session = this.createSession();
-		}
-		Folder folder = null;
-		if (id == null || id.isEmpty()) {
-			folder = session.getRootFolder();
-		} else {
-			folder = (Folder) session.getObject(id);
-		}
-		ItemIterable<CmisObject> children = folder.getChildren();
-		Iterator<CmisObject> childrenItems = children.iterator();
-		List<CmisObject> documents = new ArrayList<CmisObject>();
-		while (childrenItems.hasNext()) {
-			CmisObject item = childrenItems.next();
-			documents.add(item);
-		}
-		return documents;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jbpm.console.ng.documents.backend.server.CMISFacade#getDocumentContent(java.lang.String)
-	 */
-	@Override
-	public ContentStream getDocumentContent(String id) {
-		Session session = this.createSession();
-		if (id == null || id.isEmpty()) {
-			throw new IllegalArgumentException("No id provided");
-		}
-		Document document = (Document) session.getObject(id);
-		if (document == null) {
-			throw new IllegalArgumentException(
-					"Document with this id does not exist");
-		}
-		return document.getContentStream();
-	}
-
 	private Session createSession() {
 		SessionFactory factory = SessionFactoryImpl.newInstance();
 		Map<String, String> parameter = new HashMap<String, String>();
@@ -112,5 +77,60 @@ public class CMISFacadeService implements CMISFacade {
 		// create session
 		Session session = factory.createSession(parameter);
 		return session;
+	}
+	
+	@Override
+	public List<CMSContentSummary> getChildren(String id) {
+		if (session == null) {
+			session = this.createSession();
+		}
+		Folder folder = null;
+		if (id == null || id.isEmpty()) {
+			folder = session.getRootFolder();
+		} else {
+			folder = (Folder) session.getObject(id);
+		}
+		ItemIterable<CmisObject> children = folder.getChildren();
+		Iterator<CmisObject> childrenItems = children.iterator();
+		List<CmisObject> documents = new ArrayList<CmisObject>();
+		while (childrenItems.hasNext()) {
+			CmisObject item = childrenItems.next();
+			documents.add(item);
+		}
+		return this.transform(documents);
+	}
+	
+	@Override
+	public InputStream getDocumentContent(String id) {
+		Session session = this.createSession();
+		if (id == null || id.isEmpty()) {
+			throw new IllegalArgumentException("No id provided");
+		}
+		Document document = (Document) session.getObject(id);
+		if (document == null) {
+			throw new IllegalArgumentException(
+					"Document with this id does not exist");
+		}
+		return document.getContentStream().getStream();
+	}
+	
+	public List<CMSContentSummary> transform(List<CmisObject> children) {
+		List<CMSContentSummary> documents = new ArrayList<CMSContentSummary>();
+		for (CmisObject item : children) {
+			 CMSContentSummary doc = null;
+			if (((ObjectType)item.getType()).getId().equals("cmis:folder") ){
+				Folder folder = (Folder) item;
+		    	doc = new FolderSummary(item.getName(), item.getId(), folder.getPath());
+		    	Folder parent = ((Folder)item).getParents().get(0); //for now, assume it only has one parent.
+		    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
+		    }
+		    else {
+		    	doc = new DocumentSummary(item.getName(), item.getId(), null);
+		    	Folder parent = ((Document)item).getParents().get(0); //for now, assume it only has one parent.
+		    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
+		    }
+		    documents.add(doc);
+		}
+		return documents;
 	}
 }

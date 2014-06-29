@@ -1,9 +1,6 @@
 package org.jbpm.console.ng.dm.model;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
-
-@Portable
-public class CMSContentSummary {
+public abstract class CMSContentSummary {
 
 	private String name;
 	
@@ -13,22 +10,18 @@ public class CMSContentSummary {
 	
 	private CMSContentSummary parent;
 	
-	private ContentType contentType;
 	
-	public CMSContentSummary(String name, String id, ContentType contentType, String path) {
+	public CMSContentSummary(String name, String id, String path) {
 		super();
 		this.name = name;
 		this.id = id;
-		this.contentType = contentType;
 		this.path = path;
 	}
 
 	public CMSContentSummary() {
 	}
 	
-	public ContentType getContentType() {
-		return contentType;
-	}
+	public abstract ContentType getContentType();
 	
 	public String getId() {
 		return id;
@@ -36,10 +29,6 @@ public class CMSContentSummary {
 	
 	public String getName() {
 		return name;
-	}
-	
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
 	}
 	
 	public void setId(String id) {
@@ -61,6 +50,8 @@ public class CMSContentSummary {
 	public String getPath() {
 		return path;
 	}
+	
+	
 	
 	public static enum ContentType {
 		DOCUMENT,

@@ -16,47 +16,116 @@
 
 package org.jbpm.console.ng.dm.model;
 
-import java.io.Serializable;
+import java.util.Date;
+import java.util.Map;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
+import org.jbpm.document.Document;
 
 @Portable
-public class DocumentSummary implements Serializable{
+public class DocumentSummary extends CMSContentSummary /**implements Document */{
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1136756965587896092L;
+	private static final long serialVersionUID = 1946063131992320204L;
+
+	public DocumentSummary(String name, String id, String path) {
+		super(name, id, path);
+	}
 	
-	private String id;
-    private String name;
-    
-    public DocumentSummary() {
-    }
+	public DocumentSummary() {
+	}
 
-    public DocumentSummary(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    @Override
-    public String toString() {
-        return "TaskSummary [id=" + id + ", name=" + name + "]";
-    }
-
+	@Override
+	public ContentType getContentType() {
+		return ContentType.DOCUMENT;
+	}
+//
+//	@Override
+//	public void setIdentifier(String identifier) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public String getIdentifier() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setSize(long size) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public long getSize() {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+//
+//	@Override
+//	public void setLastModified(Date lastModified) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public Date getLastModified() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setLink(String link) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public String getLink() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public String getAttribute(String attributeName) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void addAttribute(String attributeName, String attributeValue) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void setAttributes(Map<String, String> attributes) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public Map<String, String> getAttributes() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setContent(byte[] content) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public byte[] getContent() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+	
+	
+	
 }

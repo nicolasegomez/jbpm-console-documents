@@ -1,6 +1,5 @@
 package org.jbpm.console.ng.documents.backend.server;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,19 +10,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-
 public class DocumentViewServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3950781302033089580L;
+
 	@Inject
-	private CMISFacade cmisService;
+	private DocumentService documentService;
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse response)
 			throws ServletException, IOException {
-		ContentStream stream = cmisService.getDocumentContent(req.getParameter("documentId"));
 		OutputStream out = response.getOutputStream();
-		InputStream in = stream.getStream();
+		InputStream in = this.documentService.getDocumentContent(req.getParameter("documentId"));
 		byte[] buffer = new byte[4096];
 		int length;
 		while ((length = in.read(buffer)) > 0){
