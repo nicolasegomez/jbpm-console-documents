@@ -7,10 +7,12 @@ import org.jbpm.console.ng.dm.model.CMSContentSummary;
 
 public interface DocumentService {
 
-	public abstract List<CMSContentSummary> getChildren(String id);
+	List<CMSContentSummary> getChildren(String id);
+	
+	CMSContentSummary getDocument(String id);
+	
+	InputStream getDocumentContent(String id);
 
-	public abstract InputStream getDocumentContent(String id);
-	
-	public abstract CMSContentSummary getDocument(String id);
-	
+	void removeDocument(String id);
+
 }

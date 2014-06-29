@@ -13,6 +13,7 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
@@ -112,7 +113,19 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		}
 		return document.getContentStream().getStream();
 	}
-	
+
+	@Override
+	public void removeDocument(final String id) {
+		if (session == null) {
+			session = this.createSession();
+		}
+		session.delete(new ObjectId() {
+			@Override
+			public String getId() {
+				return id;
+			}
+		});
+	}
 	public List<CMSContentSummary> transform(List<CmisObject> children) {
 		List<CMSContentSummary> documents = new ArrayList<CMSContentSummary>();
 		for (CmisObject item : children) {

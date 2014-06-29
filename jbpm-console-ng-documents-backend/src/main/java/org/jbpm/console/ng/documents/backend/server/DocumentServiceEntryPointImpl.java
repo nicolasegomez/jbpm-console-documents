@@ -25,4 +25,9 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 	public CMSContentSummary getDocument(String id) {
 		return this.documentService.getDocument(id);
 	}
+	
+	@Override
+	public void removeDocument(String id) {
+		this.documentService.removeDocument(id);
+	}
 }

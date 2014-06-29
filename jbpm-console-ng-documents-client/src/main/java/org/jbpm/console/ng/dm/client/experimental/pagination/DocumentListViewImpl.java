@@ -16,6 +16,8 @@
 package org.jbpm.console.ng.dm.client.experimental.pagination;
 
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.Dependent;
@@ -25,6 +27,7 @@ import javax.inject.Inject;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.events.DocumentRemoveSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.gc.client.util.ResizableHeader;
@@ -36,14 +39,18 @@ import org.uberfire.workbench.events.NotificationEvent;
 import com.github.gwtbootstrap.client.ui.DataGrid;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.google.gwt.cell.client.ActionCell.Delegate;
+import com.google.gwt.cell.client.CompositeCell;
+import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RequiresResize;
@@ -55,7 +62,7 @@ import com.google.gwt.view.client.SelectionModel;
 
 @Dependent
 @Templated(value = "DocumentListViewImpl.html")
-public class DocumentListViewImpl extends Composite implements
+public class DocumentListViewImpl extends ActionsCellDocuments implements
 		DocumentListPresenter.DocumentListView, RequiresResize {
 
 	@Inject
@@ -68,6 +75,8 @@ public class DocumentListViewImpl extends Composite implements
 
 	private String currentFilter = "";
 
+	private Constants constants = GWT.create(Constants.class);
+	
 	@Inject
 	@DataField
 	public DataGrid<CMSContentSummary> processdefListGrid;
@@ -100,6 +109,9 @@ public class DocumentListViewImpl extends Composite implements
 	
 	@Inject
 	private Event<DocumentsParentSearchEvent> parentDocEvent;
+	
+	@Inject
+	private Event<DocumentRemoveSearchEvent> removeDocEvent;
 
 	@Inject
 	private Event<NotificationEvent> notification;
@@ -208,7 +220,7 @@ public class DocumentListViewImpl extends Composite implements
 							final CellPreviewEvent<CMSContentSummary> event) {
 						CMSContentSummary summary = event.getValue();
 
-						if (BrowserEvents.CLICK.equalsIgnoreCase(event
+						if (BrowserEvents.DBLCLICK.equalsIgnoreCase(event
 								.getNativeEvent().getType())) {
 							selectDocEvent.fire(new DocumentsListSearchEvent(
 									summary));
@@ -251,6 +263,33 @@ public class DocumentListViewImpl extends Composite implements
 		processdefListGrid.addColumn(idColumn, new ResizableHeader("ID",
 				processdefListGrid, idColumn));
 
+        // actions (icons)
+        List<HasCell<CMSContentSummary, ?>> cells = new LinkedList<HasCell<CMSContentSummary, ?>>();
+        
+        cells.add(new GoHasCell("Go", new Delegate<CMSContentSummary>() {
+            @Override
+            public void execute(CMSContentSummary process) {
+            	selectDocEvent.fire(new DocumentsListSearchEvent(process));
+            	pathLink.setText(process.getPath());
+            }
+        }));
+
+        cells.add(new RemoveHasCell("Remove", new Delegate<CMSContentSummary>() {
+            @Override
+            public void execute(CMSContentSummary process) {
+            	removeDocEvent.fire(new DocumentRemoveSearchEvent(process));
+            }
+        }));
+        
+        CompositeCell<CMSContentSummary> cell = new CompositeCell<CMSContentSummary>(cells);
+        Column<CMSContentSummary, CMSContentSummary> actionsColumn = new Column<CMSContentSummary, CMSContentSummary>(cell) {
+            @Override
+            public CMSContentSummary getValue(CMSContentSummary object) {
+                return object;
+            }
+        };
+        processdefListGrid.addColumn(actionsColumn, new ResizableHeader("Actions", processdefListGrid, actionsColumn));
+        processdefListGrid.setColumnWidth(actionsColumn, "70px");
 	}
 
 	@Override

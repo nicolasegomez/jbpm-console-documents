@@ -10,6 +10,10 @@ public interface DocumentServiceEntryPoint {
 
 	public List<CMSContentSummary> getDocuments(String path);
 	
+
 	public CMSContentSummary getDocument(String id);
+
+	public void removeDocument(String id);
+
 
 }
