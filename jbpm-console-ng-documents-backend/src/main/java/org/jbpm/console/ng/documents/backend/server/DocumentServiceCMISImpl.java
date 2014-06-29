@@ -22,7 +22,6 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
-import org.jbpm.console.ng.dm.model.CMSContentSummary.ContentType;
 import org.jbpm.console.ng.dm.model.DocumentSummary;
 import org.jbpm.console.ng.dm.model.FolderSummary;
 
@@ -117,20 +116,38 @@ public class DocumentServiceCMISImpl implements DocumentService {
 	public List<CMSContentSummary> transform(List<CmisObject> children) {
 		List<CMSContentSummary> documents = new ArrayList<CMSContentSummary>();
 		for (CmisObject item : children) {
-			 CMSContentSummary doc = null;
-			if (((ObjectType)item.getType()).getId().equals("cmis:folder") ){
-				Folder folder = (Folder) item;
-		    	doc = new FolderSummary(item.getName(), item.getId(), folder.getPath());
-		    	Folder parent = ((Folder)item).getParents().get(0); //for now, assume it only has one parent.
-		    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
-		    }
-		    else {
-		    	doc = new DocumentSummary(item.getName(), item.getId(), null);
-		    	Folder parent = ((Document)item).getParents().get(0); //for now, assume it only has one parent.
-		    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
-		    }
-		    documents.add(doc);
+			documents.add(transform(item));
 		}
 		return documents;
+	}
+	
+	public CMSContentSummary transform(CmisObject object) {
+		CMSContentSummary doc = null;
+		if (((ObjectType)object.getType()).getId().equals("cmis:folder") ){
+			Folder folder = (Folder) object;
+	    	doc = new FolderSummary(object.getName(), object.getId(), folder.getPath());
+	    	Folder parent = ((Folder)object).getParents().get(0); //for now, assume it only has one parent.
+	    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
+	    }
+	    else {
+	    	doc = new DocumentSummary(object.getName(), object.getId(), null);
+	    	Folder parent = ((Document)object).getParents().get(0); //for now, assume it only has one parent.
+	    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
+	    }
+	    return doc;
+	}
+	
+	@Override
+	public CMSContentSummary getDocument(String id) {
+		if (session == null) {
+			session = this.createSession();
+		}
+		
+		Document document = null; 
+		if (id != null && !id.isEmpty()) {
+			document = (Document) session.getObject(id); 
+		}
+		
+		return this.transform(document);
 	}
 }

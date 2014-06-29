@@ -20,4 +20,9 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 	public List<CMSContentSummary> getDocuments(String id) {
 		return this.documentService.getChildren(id);
 	}
+
+	@Override
+	public CMSContentSummary getDocument(String id) {
+		return this.documentService.getDocument(id);
+	}
 }

@@ -11,4 +11,6 @@ public interface DocumentService {
 
 	public abstract InputStream getDocumentContent(String id);
 	
+	public abstract CMSContentSummary getDocument(String id);
+	
 }

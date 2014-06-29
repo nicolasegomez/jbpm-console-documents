@@ -20,12 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.events.DocumentDefSelectionEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
@@ -34,15 +36,21 @@ import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.mvp.PlaceManager;
+import org.uberfire.client.mvp.PlaceStatus;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnOpen;
+import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.Command;
+import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
 
 import com.github.gwtbootstrap.client.ui.DataGrid;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
@@ -72,9 +80,15 @@ public class DocumentListPresenter {
 
 	@Inject
 	private DocumentListView view;
+	
+	@Inject
+    private PlaceManager placeManager;
 
 	@Inject
 	private Caller<DocumentServiceEntryPoint> dataServices;
+	
+	@Inject
+    private Event<DocumentDefSelectionEvent> documentDefSelected;
 
 	List<CMSContentSummary> currentDocuments = null;
 	
@@ -128,7 +142,7 @@ public class DocumentListPresenter {
 	public void refreshData() {
 		dataProvider.refresh();
 	}
-
+	
 	@OnOpen
 	public void onOpen() {
 		currentCMSContentSummary = null;
@@ -170,12 +184,20 @@ public class DocumentListPresenter {
 			this.refreshDocumentList(event.getSummary().getId());
 		} else {
 			// it is a document!
-			Window.open(linkURL + "?documentId=" + event.getSummary().getId()
-					+ "&documentName=" + event.getSummary().getName(),
-					"_blank", "");
-		}
+		    CMSContentSummary document = null;
+            PlaceStatus instanceDetailsStatus = placeManager.getStatus(new DefaultPlaceRequest("Document Details"));
+            if(instanceDetailsStatus == PlaceStatus.OPEN){
+                placeManager.closePlace("Document Details");
+            }
+                    document = event.getSummary();
+                    placeManager.goTo("Document Details");
+                    documentDefSelected.fire(new DocumentDefSelectionEvent(document.getId()));
+        }
+//      		Window.open(linkURL + "?documentId=" + event.getSummary().getId()
+//					+ "&documentName=" + event.getSummary().getName(),
+//					"_blank", "");
 	}
-	
+		
 	public void onDocumentsParentSelectionEvent(
 			@Observes DocumentsParentSearchEvent event) {
 		if (currentCMSContentSummary != null){
