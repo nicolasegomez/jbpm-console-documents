@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.events.DocumentRemoveSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
@@ -184,7 +185,16 @@ public class DocumentListPresenter {
 			} else {
 				this.refreshDocumentList(null);
 			}
-		}
-		
+		}	
+	}
+	
+	public void onDocumentRemoveEvent(
+			@Observes DocumentRemoveSearchEvent event) {
+		this.dataServices.call(new RemoteCallback<Void>() {
+			@Override
+			public void callback(Void response) {
+				refreshDocumentList(currentCMSContentSummary.getId());
+			}
+		}).removeDocument(event.getSummary().getId());
 	}
 }

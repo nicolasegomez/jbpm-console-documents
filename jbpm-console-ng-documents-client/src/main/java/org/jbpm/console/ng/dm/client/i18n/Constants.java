@@ -40,4 +40,10 @@ public interface Constants extends Messages {
     String No_Items_Found();
 
     String New_Item();
+    
+    String Details();
+    
+    String Remove();
+    
+    String Go();
 }
