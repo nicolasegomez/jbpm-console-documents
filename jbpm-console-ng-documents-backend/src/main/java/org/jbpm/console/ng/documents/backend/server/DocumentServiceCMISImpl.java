@@ -18,6 +18,7 @@ import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.bindings.spi.webservices.CXFPortProvider;
+import org.apache.chemistry.opencmis.client.bindings.spi.webservices.SunRIPortProvider;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
@@ -72,7 +73,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/VersioningService?wsdl");
 		parameter.put(SessionParameter.REPOSITORY_ID, "dms");
 		parameter.put(SessionParameter.WEBSERVICES_PORT_PROVIDER_CLASS,
-				CXFPortProvider.class.getName());
+				SunRIPortProvider.class.getName());
 
 		// create session
 		Session session = factory.createSession(parameter);
