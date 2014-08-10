@@ -24,6 +24,9 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.jbpm.console.ng.dm.model.events.NewDocumentEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -41,11 +44,6 @@ public class NewDocumentPresenter {
     public interface NewDocumentView extends UberView<NewDocumentPresenter> {
 
     	void setFolder(String folder);
-//        Focusable getJobNameText();
-//
-//        void removeRow( RequestParameterSummary parameter );
-//
-//        void addRow( RequestParameterSummary parameter );
 
         void displayNotification( String notification );
     }
@@ -55,6 +53,8 @@ public class NewDocumentPresenter {
     NewDocumentView view;
     @Inject
     private Event<BeforeClosePlaceEvent> closePlaceEvent;
+    @Inject
+    private Event<NewDocumentEvent> documentAddedEvent;
     @Inject
     private Caller<DocumentServiceEntryPoint> documentServices;
     private PlaceRequest place;
@@ -91,5 +91,16 @@ public class NewDocumentPresenter {
 
     public void close() {
         closePlaceEvent.fire( new BeforeClosePlaceEvent( this.place ) );
+    }
+    
+    public void createDocument(DocumentSummary doc) {
+    	this.documentServices.call(new RemoteCallback<Void>() {
+    		@Override
+    		public void callback(Void response) {
+    			close();
+    			documentAddedEvent.fire(new NewDocumentEvent());
+    			System.out.println("Hello");
+    		}
+		}).addDocument(doc);
     }
 }

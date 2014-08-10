@@ -33,6 +33,7 @@ import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.jbpm.console.ng.gc.client.util.ResizableHeader;
 import org.uberfire.client.common.BusyPopup;
 import org.uberfire.client.mvp.PlaceManager;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.security.Identity;
 import org.uberfire.workbench.events.NotificationEvent;
 
@@ -76,7 +77,7 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 	private String currentFilter = "";
 
 	private Constants constants = GWT.create(Constants.class);
-	
+
 	@Inject
 	@DataField
 	public DataGrid<CMSContentSummary> processdefListGrid;
@@ -84,32 +85,32 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 	@Inject
 	@DataField
 	public LayoutPanel listContainer;
-	
+
 	@Inject
-    @DataField
-    public NavLink parentLink;
-	
+	@DataField
+	public NavLink parentLink;
+
 	@Inject
-    @DataField
-    public Anchor pathLink;
-	
+	@DataField
+	public Anchor pathLink;
+
 	@Inject
-    @DataField
-    public NavLink homeLink;
-	
+	@DataField
+	public NavLink homeLink;
+
 	@Inject
-    @DataField
-    public NavLink newLink;
-	
+	@DataField
+	public NavLink newLink;
+
 	@DataField
 	public SimplePager pager;
 
 	@Inject
 	private Event<DocumentsListSearchEvent> selectDocEvent;
-	
+
 	@Inject
 	private Event<DocumentsParentSearchEvent> parentDocEvent;
-	
+
 	@Inject
 	private Event<DocumentRemoveSearchEvent> removeDocEvent;
 
@@ -146,39 +147,46 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 		processdefListGrid.setEmptyTableWidget(emptyTable);
 
 		parentLink.setText("Parent");
-        parentLink.setStyleName("");
-        parentLink.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-            	parentLink.setStyleName("active");
-            	
-				if (BrowserEvents.CLICK.equalsIgnoreCase(event
-						.getNativeEvent().getType())) {
+		parentLink.setStyleName("");
+		parentLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				parentLink.setStyleName("active");
+
+				if (BrowserEvents.CLICK.equalsIgnoreCase(event.getNativeEvent()
+						.getType())) {
 					parentDocEvent.fire(new DocumentsParentSearchEvent());
 					parentLink.setStyleName("");
-					pathLink.setText(presenter.currentCMSContentSummary.getParent().getPath());
+					pathLink.setText(presenter.currentCMSContentSummary
+							.getParent().getPath());
 				}
-            }
-        });
-        
-        homeLink.setText("Home");
-        homeLink.setStyleName("");
-        homeLink.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-            	// TODO
-            }
-        });
-        
-        newLink.setText("New");
-        newLink.setStyleName("");
-        newLink.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-            	// TODO
-            }
-        });
-        
+			}
+		});
+
+		homeLink.setText("Home");
+		homeLink.setStyleName("");
+		homeLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO
+			}
+		});
+
+		newLink.setText("New");
+		newLink.setStyleName("");
+		newLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DefaultPlaceRequest req = new DefaultPlaceRequest(
+						"New Document");
+				String folder = (presenter.currentCMSContentSummary == null) ? "/"
+						: presenter.currentCMSContentSummary	
+								.getPath();
+				req.addParameter("folder", folder);
+				placeManager.goTo(req);
+			}
+		});
+
 		// Attach a column sort handler to the ListDataProvider to sort the
 		// list.
 		sortHandler = new ListHandler<CMSContentSummary>(presenter
@@ -194,7 +202,8 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 						Set<CMSContentSummary> selectedProcessDef = selectionModel
 								.getSelectedSet();
 						for (CMSContentSummary pd : selectedProcessDef) {
-							selectDocEvent.fire(new DocumentsListSearchEvent(pd));
+							selectDocEvent
+									.fire(new DocumentsListSearchEvent(pd));
 						}
 					}
 				});
@@ -263,33 +272,38 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 		processdefListGrid.addColumn(idColumn, new ResizableHeader("ID",
 				processdefListGrid, idColumn));
 
-        // actions (icons)
-        List<HasCell<CMSContentSummary, ?>> cells = new LinkedList<HasCell<CMSContentSummary, ?>>();
-        
-        cells.add(new GoHasCell("Go", new Delegate<CMSContentSummary>() {
-            @Override
-            public void execute(CMSContentSummary process) {
-            	selectDocEvent.fire(new DocumentsListSearchEvent(process));
-            	pathLink.setText(process.getPath());
-            }
-        }));
+		// actions (icons)
+		List<HasCell<CMSContentSummary, ?>> cells = new LinkedList<HasCell<CMSContentSummary, ?>>();
 
-        cells.add(new RemoveHasCell("Remove", new Delegate<CMSContentSummary>() {
-            @Override
-            public void execute(CMSContentSummary process) {
-            	removeDocEvent.fire(new DocumentRemoveSearchEvent(process));
-            }
-        }));
-        
-        CompositeCell<CMSContentSummary> cell = new CompositeCell<CMSContentSummary>(cells);
-        Column<CMSContentSummary, CMSContentSummary> actionsColumn = new Column<CMSContentSummary, CMSContentSummary>(cell) {
-            @Override
-            public CMSContentSummary getValue(CMSContentSummary object) {
-                return object;
-            }
-        };
-        processdefListGrid.addColumn(actionsColumn, new ResizableHeader("Actions", processdefListGrid, actionsColumn));
-        processdefListGrid.setColumnWidth(actionsColumn, "70px");
+		cells.add(new GoHasCell("Go", new Delegate<CMSContentSummary>() {
+			@Override
+			public void execute(CMSContentSummary process) {
+				selectDocEvent.fire(new DocumentsListSearchEvent(process));
+				pathLink.setText(process.getPath());
+			}
+		}));
+
+		cells.add(new RemoveHasCell("Remove",
+				new Delegate<CMSContentSummary>() {
+					@Override
+					public void execute(CMSContentSummary process) {
+						removeDocEvent.fire(new DocumentRemoveSearchEvent(
+								process));
+					}
+				}));
+
+		CompositeCell<CMSContentSummary> cell = new CompositeCell<CMSContentSummary>(
+				cells);
+		Column<CMSContentSummary, CMSContentSummary> actionsColumn = new Column<CMSContentSummary, CMSContentSummary>(
+				cell) {
+			@Override
+			public CMSContentSummary getValue(CMSContentSummary object) {
+				return object;
+			}
+		};
+		processdefListGrid.addColumn(actionsColumn, new ResizableHeader(
+				"Actions", processdefListGrid, actionsColumn));
+		processdefListGrid.setColumnWidth(actionsColumn, "70px");
 	}
 
 	@Override

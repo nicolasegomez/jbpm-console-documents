@@ -1,6 +1,8 @@
 package org.jbpm.console.ng.documents.backend.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,11 +19,14 @@ import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
-import org.apache.chemistry.opencmis.client.bindings.spi.webservices.CXFPortProvider;
 import org.apache.chemistry.opencmis.client.bindings.spi.webservices.SunRIPortProvider;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.DocumentSummary;
@@ -31,9 +36,8 @@ import org.jbpm.console.ng.dm.model.FolderSummary;
 @ApplicationScoped
 public class DocumentServiceCMISImpl implements DocumentService {
 
-
 	private Session session;
-	
+
 	private Session createSession() {
 		SessionFactory factory = SessionFactoryImpl.newInstance();
 		Map<String, String> parameter = new HashMap<String, String>();
@@ -79,7 +83,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		Session session = factory.createSession(parameter);
 		return session;
 	}
-	
+
 	@Override
 	public List<CMSContentSummary> getChildren(String id) {
 		if (session == null) {
@@ -100,7 +104,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		}
 		return this.transform(documents);
 	}
-	
+
 	@Override
 	public InputStream getDocumentContent(String id) {
 		Session session = this.createSession();
@@ -127,6 +131,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 			}
 		});
 	}
+
 	public List<CMSContentSummary> transform(List<CmisObject> children) {
 		List<CMSContentSummary> documents = new ArrayList<CMSContentSummary>();
 		for (CmisObject item : children) {
@@ -134,34 +139,61 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		}
 		return documents;
 	}
-	
+
 	public CMSContentSummary transform(CmisObject object) {
 		CMSContentSummary doc = null;
-		if (((ObjectType)object.getType()).getId().equals("cmis:folder") ){
+		if (((ObjectType) object.getType()).getId().equals("cmis:folder")) {
 			Folder folder = (Folder) object;
-	    	doc = new FolderSummary(object.getName(), object.getId(), folder.getPath());
-	    	Folder parent = ((Folder)object).getParents().get(0); //for now, assume it only has one parent.
-	    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
-	    }
-	    else {
-	    	doc = new DocumentSummary(object.getName(), object.getId(), null);
-	    	Folder parent = ((Document)object).getParents().get(0); //for now, assume it only has one parent.
-	    	doc.setParent(new FolderSummary(parent.getName(), parent.getId(), parent.getPath()));
-	    }
-	    return doc;
+			doc = new FolderSummary(object.getName(), object.getId(),
+					folder.getPath());
+			Folder parent = ((Folder) object).getParents().get(0); // for now,
+																	// assume it
+																	// only has
+																	// one
+																	// parent.
+			doc.setParent(new FolderSummary(parent.getName(), parent.getId(),
+					parent.getPath()));
+		} else {
+			doc = new DocumentSummary(object.getName(), object.getId(), null);
+			Folder parent = ((Document) object).getParents().get(0); // for now,
+																		// assume
+																		// it
+																		// only
+																		// has
+																		// one
+																		// parent.
+			doc.setParent(new FolderSummary(parent.getName(), parent.getId(),
+					parent.getPath()));
+		}
+		return doc;
 	}
-	
+
 	@Override
 	public CMSContentSummary getDocument(String id) {
 		if (session == null) {
 			session = this.createSession();
 		}
-		
-		Document document = null; 
+
+		Document document = null;
 		if (id != null && !id.isEmpty()) {
-			document = (Document) session.getObject(id); 
+			document = (Document) session.getObject(id);
 		}
-		
+
 		return this.transform(document);
+	}
+
+	@Override
+	public void createDocument(DocumentSummary doc) {
+		if (session == null) {
+			session = this.createSession();
+		}
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+		properties.put(PropertyIds.NAME, doc.getName());
+		InputStream stream = new ByteArrayInputStream(doc.getContent());
+		ContentStream contentStream = new ContentStreamImpl(doc.getName(),
+				BigInteger.valueOf(doc.getContent().length), "text/plain",
+				stream);
+		((Folder)this.session.getObjectByPath(doc.getPath())).createDocument(properties, contentStream, VersioningState.NONE);
 	}
 }

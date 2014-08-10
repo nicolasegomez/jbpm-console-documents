@@ -31,6 +31,7 @@ import org.jbpm.console.ng.dm.model.events.DocumentDefSelectionEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentRemoveSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
+import org.jbpm.console.ng.dm.model.events.NewDocumentEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 import org.jbpm.console.ng.gc.client.i18n.Constants;
 import org.uberfire.client.annotations.WorkbenchMenu;
@@ -118,6 +119,10 @@ public class DocumentListPresenter {
 			@Override
 			public void callback(List<CMSContentSummary> documents) {
 				currentDocuments = documents;
+				CMSContentSummary first = documents.get(0);
+				if (first != null) {
+					currentCMSContentSummary = first.getParent();
+				}
 				filterProcessList(view.getCurrentFilter());
 			}
 		}).getDocuments(id);
@@ -218,5 +223,10 @@ public class DocumentListPresenter {
 				refreshDocumentList(currentCMSContentSummary.getId());
 			}
 		}).removeDocument(event.getSummary().getId());
+	}
+	
+	public void onDocumentAddedEvent(
+			@Observes NewDocumentEvent event) {
+		refreshDocumentList(currentCMSContentSummary.getId());
 	}
 }

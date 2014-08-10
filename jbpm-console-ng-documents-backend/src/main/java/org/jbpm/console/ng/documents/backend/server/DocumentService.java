@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
 
 public interface DocumentService {
 
@@ -15,4 +16,5 @@ public interface DocumentService {
 
 	void removeDocument(String id);
 
+	void createDocument(DocumentSummary doc);
 }

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
 
 @Service
@@ -29,5 +30,11 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 	@Override
 	public void removeDocument(String id) {
 		this.documentService.removeDocument(id);
+	}
+	
+	@Override
+	public void addDocument(DocumentSummary doc) {
+		doc.setContent("test".getBytes());
+		this.documentService.createDocument(doc);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jboss.errai.bus.server.annotations.Remote;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
+import org.jbpm.console.ng.dm.model.DocumentSummary;
 
 @Remote
 public interface DocumentServiceEntryPoint {
@@ -14,6 +15,9 @@ public interface DocumentServiceEntryPoint {
 	public CMSContentSummary getDocument(String id);
 
 	public void removeDocument(String id);
+	
+
+	void addDocument(DocumentSummary doc);
 
 
 }
