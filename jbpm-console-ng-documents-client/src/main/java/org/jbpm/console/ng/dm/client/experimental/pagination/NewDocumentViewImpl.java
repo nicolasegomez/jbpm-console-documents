@@ -38,6 +38,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -53,6 +54,7 @@ public class NewDocumentViewImpl extends Composite implements
 	public Label documentNameLabel = new Label();
 
 	public TextBox documentFolderText = new TextBox();
+	public Hidden hiddenDocumentFolderText = new Hidden();
 
 	public Label documentFolderLabel = new Label();
 
@@ -99,6 +101,12 @@ public class NewDocumentViewImpl extends Composite implements
 			}
 		});
 
+		
+		documentNameText.setName("documentName");
+		hiddenDocumentFolderText.setName("documentFolder");
+		fileUpload.setName("file");
+		newDocType.setName("documentType");
+		
 		newDocTypeLabel.setText("File Type");
 		newDocTypeLabel.setStyleName("control-label");
 		documentNameLabel.setText("Document Name");
@@ -124,6 +132,7 @@ public class NewDocumentViewImpl extends Composite implements
 		line.setHorizontalAlignment(line.ALIGN_CENTER);
 		line.add(documentFolderLabel);
 		line.add(documentFolderText);
+		line.add(hiddenDocumentFolderText);
 		allFields.add(line);
 		
 		line = new HorizontalPanel();
@@ -195,6 +204,7 @@ public class NewDocumentViewImpl extends Composite implements
 	public void setFolder(String folder) {
 		documentFolderText.setText(folder);
 		documentFolderText.setEnabled(false);
+		hiddenDocumentFolderText.setValue(folder);
 	}
 	// @Override
 	// public Focusable getJobNameText() {
