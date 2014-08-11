@@ -57,7 +57,7 @@ public class DocumentViewServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		try {
-			response.setContentType("text/html");
+			
 			FileItem file = null;
 			FileItemFactory factory = new DiskFileItemFactory();
 			ServletFileUpload upload = new ServletFileUpload(factory);
@@ -76,10 +76,9 @@ public class DocumentViewServlet extends HttpServlet {
 				}
 
 			}
-			response.getWriter().write(processUpload(file, folder));
 
+			response.getWriter().write(processUpload(file, folder));
 			response.setContentType("text/html");
-			response.getWriter().write("OK");
 		} catch (Exception e) {
 
 		}
