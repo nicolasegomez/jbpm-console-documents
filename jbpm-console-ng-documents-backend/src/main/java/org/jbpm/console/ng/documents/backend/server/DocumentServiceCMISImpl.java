@@ -26,6 +26,7 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.impl.MimeTypes;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
@@ -192,7 +193,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		properties.put(PropertyIds.NAME, doc.getName());
 		InputStream stream = new ByteArrayInputStream(doc.getContent());
 		ContentStream contentStream = new ContentStreamImpl(doc.getName(),
-				BigInteger.valueOf(doc.getContent().length), "text/plain",
+				BigInteger.valueOf(doc.getContent().length), MimeTypes.getMIMEType(doc.getName()),
 				stream);
 		((Folder)this.session.getObjectByPath(doc.getPath())).createDocument(properties, contentStream, VersioningState.NONE);
 	}

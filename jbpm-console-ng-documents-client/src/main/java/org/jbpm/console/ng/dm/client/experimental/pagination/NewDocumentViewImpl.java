@@ -122,29 +122,32 @@ public class NewDocumentViewImpl extends Composite implements
 		VerticalPanel allFields = new VerticalPanel();
 		
 		
-		HorizontalPanel line = new HorizontalPanel();
-		line.setHorizontalAlignment(line.ALIGN_CENTER);
-		line.add(documentNameLabel);
-		line.add(documentNameText);
-		allFields.add(line);
+//		HorizontalPanel line = new HorizontalPanel();
+//		line.setHorizontalAlignment(line.ALIGN_CENTER);
+//		line.add(documentNameLabel);
+//		line.add(documentNameText);
+//		allFields.add(line);
 		
-		line = new HorizontalPanel();
+		HorizontalPanel line = new HorizontalPanel();
 		line.setHorizontalAlignment(line.ALIGN_CENTER);
 		line.add(documentFolderLabel);
 		line.add(documentFolderText);
+
 		line.add(hiddenDocumentFolderText);
+		documentFolderText.setName("folder");
 		allFields.add(line);
 		
-		line = new HorizontalPanel();
-		line.setHorizontalAlignment(line.ALIGN_CENTER);
-		line.add(newDocTypeLabel);
-		line.add(newDocType);
-		allFields.add(line);
+//		line = new HorizontalPanel();
+//		line.setHorizontalAlignment(line.ALIGN_CENTER);
+//		line.add(newDocTypeLabel);
+//		line.add(newDocType);
+//		allFields.add(line);
 		
 		line = new HorizontalPanel();
 		line.setHorizontalAlignment(line.ALIGN_CENTER);
 		line.add(fileUploadLabel);
 		line.add(fileUpload);
+		fileUpload.setName("file");
 		allFields.add(line);
 		
 		
