@@ -23,17 +23,23 @@ import javax.inject.Inject;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.console.ng.dm.client.i18n.Constants;
-import org.jbpm.console.ng.dm.model.DocumentSummary;
+import org.uberfire.client.common.BusyPopup;
+import org.uberfire.client.common.popups.errors.ErrorPopup;
 import org.uberfire.workbench.events.NotificationEvent;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.FileUpload;
+import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 @Dependent
 @Templated(value = "NewDocumentViewImpl.html")
@@ -42,25 +48,21 @@ public class NewDocumentViewImpl extends Composite implements
 
 	private Constants constants = GWT.create(Constants.class);
 
-	@Inject
-	@DataField
-	public TextBox documentNameText;
+	public TextBox documentNameText = new TextBox();
 
-	@Inject
-	@DataField
-	public Label documentNameLabel;
+	public Label documentNameLabel = new Label();
 
-	@Inject
-	@DataField
-	public TextBox documentFolderText;
+	public TextBox documentFolderText = new TextBox();
 
-	@Inject
-	@DataField
-	public Label documentFolderLabel;
+	public Label documentFolderLabel = new Label();
 
-	@Inject
-	@DataField
-	public Label newDocTypeLabel;
+	public Label newDocTypeLabel = new Label();
+	
+	public ListBox newDocType = new ListBox();
+
+	public FileUpload fileUpload = new FileUpload();
+
+	public Label fileUploadLabel = new Label();
 
 	@Inject
 	@DataField
@@ -68,7 +70,7 @@ public class NewDocumentViewImpl extends Composite implements
 
 	@Inject
 	@DataField
-	public ListBox newDocType;
+	public Form formUpload;
 
 	@Inject
 	Event<NotificationEvent> notificationEvents;
@@ -84,25 +86,109 @@ public class NewDocumentViewImpl extends Composite implements
 
 			@Override
 			public void onClick(ClickEvent event) {
-				String type = newDocType.getValue();
-				if ("Text File".equals(type)) {
-					DocumentSummary doc = new DocumentSummary(documentNameText
-							.getText() + ".txt", null, documentFolderText.getValue());
-					doc.setContent("test".getBytes());
-					presenter.createDocument(doc);
+				BusyPopup.showMessage("Loading...");
+				formUpload.submit();
+				// String type = newDocType.getValue();
+				// if ("Text File".equals(type)) {
+				// DocumentSummary doc = new DocumentSummary(documentNameText
+				// .getText() + ".txt", null, documentFolderText.getValue());
+				//
+				// doc.setContent("test".getBytes());
+				// presenter.createDocument(doc);
+				// }
+			}
+		});
+
+		newDocTypeLabel.setText("File Type");
+		newDocTypeLabel.setStyleName("control-label");
+		documentNameLabel.setText("Document Name");
+		documentNameLabel.setStyleName("control-label");
+		documentFolderLabel.setText("Document Folder");
+		documentFolderLabel.setStyleName("control-label");
+		fileUploadLabel.setText("Upload");
+		fileUploadLabel.setStyleName("control-label");
+		newDocType.addItem("Text File");
+		newDocType.addItem("PDF");
+
+		formUpload.setAction(getWebContext() + "/documentview/");
+		VerticalPanel allFields = new VerticalPanel();
+		
+		
+		HorizontalPanel line = new HorizontalPanel();
+		line.setHorizontalAlignment(line.ALIGN_CENTER);
+		line.add(documentNameLabel);
+		line.add(documentNameText);
+		allFields.add(line);
+		
+		line = new HorizontalPanel();
+		line.setHorizontalAlignment(line.ALIGN_CENTER);
+		line.add(documentFolderLabel);
+		line.add(documentFolderText);
+		allFields.add(line);
+		
+		line = new HorizontalPanel();
+		line.setHorizontalAlignment(line.ALIGN_CENTER);
+		line.add(newDocTypeLabel);
+		line.add(newDocType);
+		allFields.add(line);
+		
+		line = new HorizontalPanel();
+		line.setHorizontalAlignment(line.ALIGN_CENTER);
+		line.add(fileUploadLabel);
+		line.add(fileUpload);
+		allFields.add(line);
+		
+		
+		formUpload.add(allFields);
+
+		formUpload.addSubmitHandler(new Form.SubmitHandler() {
+			@Override
+			public void onSubmit(final Form.SubmitEvent event) {
+				String fileName = fileUpload.getFilename();
+				if (fileName == null || "".equals(fileName)) {
+					BusyPopup.close();
+					Window.alert("Please select a file!");
+					event.cancel();
 				}
 			}
 		});
-		newDocTypeLabel.setText("File Type");
-		documentNameLabel.setText("Document Name");
-		documentFolderLabel.setText("Document Folder");
-		newDocType.addItem("Text File");
-		newDocType.addItem("PDF");
+
+		formUpload.addSubmitCompleteHandler(new Form.SubmitCompleteHandler() {
+			public void onSubmitComplete(final Form.SubmitCompleteEvent event) {
+				if ("OK".equalsIgnoreCase(event.getResults())) {
+					BusyPopup.close();
+					Window.alert("Great!");
+
+					fileUpload.getElement().setPropertyString("value", "");
+					hide();
+				} else if ("NO VALID POM".equalsIgnoreCase(event.getResults())) {
+					BusyPopup.close();
+				} else {
+					BusyPopup.close();
+					ErrorPopup.showMessage("Something wrong: " + event.getResults());
+					hide();
+				}
+			}
+		});
+
 	}
 
 	@Override
 	public void displayNotification(String notification) {
 		notificationEvents.fire(new NotificationEvent(notification));
+	}
+
+	private String getWebContext() {
+		String context = GWT.getModuleBaseURL().replace(
+				GWT.getModuleName() + "/", "");
+		if (context.endsWith("/")) {
+			context = context.substring(0, context.length() - 1);
+		}
+		return context;
+	}
+
+	public void hide() {
+		presenter.close();
 	}
 
 	@Override

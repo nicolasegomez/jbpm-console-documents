@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jbpm.console.ng.dm.model.events.NewDocumentEvent;
+
 public class DocumentViewServlet extends HttpServlet {
 
 	/**
@@ -36,4 +39,15 @@ public class DocumentViewServlet extends HttpServlet {
 		in.close();
 		out.flush();
 	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		
+		documentService.createDocument(doc);
+		
+		resp.setContentType( "text/html" );
+		resp.getWriter().write( "OK" );
+	}
+	
 }
