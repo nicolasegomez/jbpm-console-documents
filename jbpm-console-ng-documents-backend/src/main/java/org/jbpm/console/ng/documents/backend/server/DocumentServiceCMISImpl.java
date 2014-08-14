@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
@@ -37,51 +38,72 @@ import org.jbpm.console.ng.dm.model.FolderSummary;
 @ApplicationScoped
 public class DocumentServiceCMISImpl implements DocumentService {
 
+	private Map<String, String> parameters;
+
 	private Session session;
+
+	@PostConstruct
+	private void init() {
+		parameters = new HashMap<String, String>();
+		String webServicesACLServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ACLService?wsdl";
+		String webServicesDiscoveryServices = "http://localhost:8080/cmis/services/DiscoveryService?wsdl";
+		String webServicesMultifilingServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/MultiFilingService?wsdl";
+		String webServicesNavigationServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/NavigationService?wsdl";
+		String webServicesObjectServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ObjectService?wsdl";
+		String webServicesPolicyServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/PolicyService?wsdl";
+		String webServicesRelationshipServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/RelationshipService?wsdl";
+		String webServicesRepositoryServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/RepositoryService?wsdl";
+		String webServicesVersioningServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/VersioningService?wsdl";
+		String repositoryID = "dms";
+		String user = "superuser";
+		String password = "superuser";
+
+		// user credentials
+		parameters.put(SessionParameter.USER, "superuser");
+		parameters.put(SessionParameter.PASSWORD, "superuser");
+
+		// connection settings
+		parameters.put(SessionParameter.BINDING_TYPE,
+				BindingType.WEBSERVICES.value());
+		parameters.put(SessionParameter.WEBSERVICES_ACL_SERVICE,
+				webServicesACLServices);
+		parameters.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE,
+				webServicesDiscoveryServices);
+		parameters.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE,
+				webServicesMultifilingServices);
+		parameters.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE,
+				webServicesNavigationServices);
+		parameters.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE,
+				webServicesObjectServices);
+		parameters.put(SessionParameter.WEBSERVICES_POLICY_SERVICE,
+				webServicesPolicyServices);
+		parameters.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE,
+				webServicesRelationshipServices);
+		parameters.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE,
+				webServicesRepositoryServices);
+		parameters.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE,
+				webServicesVersioningServices);
+		parameters.put(SessionParameter.REPOSITORY_ID, repositoryID);
+		parameters.put(SessionParameter.WEBSERVICES_PORT_PROVIDER_CLASS,
+				SunRIPortProvider.class.getName());
+
+	}
+	
+	@Override
+	public Map<String,String> getConfigurationParameters(){
+		return parameters;
+	}
+	
+	@Override
+	public void setConfigurationParameters(Map<String,String> parameters){
+		this. parameters = parameters;
+	}
 
 	private Session createSession() {
 		SessionFactory factory = SessionFactoryImpl.newInstance();
-		Map<String, String> parameter = new HashMap<String, String>();
-
-		// user credentials
-		parameter.put(SessionParameter.USER, "superuser");
-		parameter.put(SessionParameter.PASSWORD, "superuser");
-
-		// connection settings
-		parameter.put(SessionParameter.BINDING_TYPE,
-				BindingType.WEBSERVICES.value());
-		parameter
-				.put(SessionParameter.WEBSERVICES_ACL_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ACLService?wsdl");
-		parameter.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE,
-				"http://<host>:<port>/cmis/services/DiscoveryService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/MultiFilingService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/NavigationService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ObjectService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_POLICY_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/PolicyService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/RelationshipService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/RepositoryService?wsdl");
-		parameter
-				.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE,
-						"http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/VersioningService?wsdl");
-		parameter.put(SessionParameter.REPOSITORY_ID, "dms");
-		parameter.put(SessionParameter.WEBSERVICES_PORT_PROVIDER_CLASS,
-				SunRIPortProvider.class.getName());
-
+		
 		// create session
-		Session session = factory.createSession(parameter);
+		Session session = factory.createSession(parameters);
 		return session;
 	}
 
@@ -193,8 +215,9 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		properties.put(PropertyIds.NAME, doc.getName());
 		InputStream stream = new ByteArrayInputStream(doc.getContent());
 		ContentStream contentStream = new ContentStreamImpl(doc.getName(),
-				BigInteger.valueOf(doc.getContent().length), MimeTypes.getMIMEType(doc.getName()),
-				stream);
-		((Folder)this.session.getObjectByPath(doc.getPath())).createDocument(properties, contentStream, VersioningState.NONE);
+				BigInteger.valueOf(doc.getContent().length),
+				MimeTypes.getMIMEType(doc.getName()), stream);
+		((Folder) this.session.getObjectByPath(doc.getPath())).createDocument(
+				properties, contentStream, VersioningState.NONE);
 	}
 }

@@ -76,24 +76,27 @@ public class DocumentListPresenter {
 		void hideBusyIndicator();
 	}
 
-	private static String linkURL = "http://127.0.0.1:8888/documentview"; // TODO not hardcoded please!
-	
+	private static String linkURL = "http://127.0.0.1:8888/documentview"; // TODO
+																			// not
+																			// hardcoded
+																			// please!
+
 	private Menus menus;
 
 	@Inject
 	private DocumentListView view;
-	
+
 	@Inject
-    private PlaceManager placeManager;
+	private PlaceManager placeManager;
 
 	@Inject
 	private Caller<DocumentServiceEntryPoint> dataServices;
-	
+
 	@Inject
-    private Event<DocumentDefSelectionEvent> documentDefSelected;
+	private Event<DocumentDefSelectionEvent> documentDefSelected;
 
 	List<CMSContentSummary> currentDocuments = null;
-	
+
 	CMSContentSummary currentCMSContentSummary;
 
 	private ListDataProvider<CMSContentSummary> dataProvider = new ListDataProvider<CMSContentSummary>();
@@ -148,7 +151,7 @@ public class DocumentListPresenter {
 	public void refreshData() {
 		dataProvider.refresh();
 	}
-	
+
 	@OnOpen
 	public void onOpen() {
 		currentCMSContentSummary = null;
@@ -157,7 +160,7 @@ public class DocumentListPresenter {
 
 	@OnFocus
 	public void onFocus() {
-		if (currentCMSContentSummary != null){
+		if (currentCMSContentSummary != null) {
 			refreshDocumentList(currentCMSContentSummary.getId());
 		} else {
 			refreshDocumentList(null);
@@ -178,6 +181,19 @@ public class DocumentListPresenter {
 						view.setCurrentFilter("");
 						view.displayNotification("Refresh complete.");
 					}
+				}).endMenu().newTopLevelMenu("Configure Repository")
+				.respondsWith(new Command() {
+					@Override
+					public void execute() {
+						CMSContentSummary document = null;
+						PlaceStatus instanceDetailsStatus = placeManager
+								.getStatus(new DefaultPlaceRequest(
+										"CMIS Configuration"));
+						if (instanceDetailsStatus == PlaceStatus.OPEN) {
+							placeManager.closePlace("CMIS Configuration");
+						}
+						placeManager.goTo("CMIS Configuration");
+					}
 				}).endMenu().build();
 
 	}
@@ -190,33 +206,35 @@ public class DocumentListPresenter {
 			this.refreshDocumentList(event.getSummary().getId());
 		} else {
 			// it is a document!
-		    CMSContentSummary document = null;
-            PlaceStatus instanceDetailsStatus = placeManager.getStatus(new DefaultPlaceRequest("Document Details"));
-            if(instanceDetailsStatus == PlaceStatus.OPEN){
-                placeManager.closePlace("Document Details");
-            }
-                    document = event.getSummary();
-                    placeManager.goTo("Document Details");
-                    documentDefSelected.fire(new DocumentDefSelectionEvent(document.getId()));
-        }
-//      		Window.open(linkURL + "?documentId=" + event.getSummary().getId()
-//					+ "&documentName=" + event.getSummary().getName(),
-//					"_blank", "");
+			CMSContentSummary document = null;
+			PlaceStatus instanceDetailsStatus = placeManager
+					.getStatus(new DefaultPlaceRequest("Document Details"));
+			if (instanceDetailsStatus == PlaceStatus.OPEN) {
+				placeManager.closePlace("Document Details");
+			}
+			document = event.getSummary();
+			placeManager.goTo("Document Details");
+			documentDefSelected.fire(new DocumentDefSelectionEvent(document
+					.getId()));
+		}
+		// Window.open(linkURL + "?documentId=" + event.getSummary().getId()
+		// + "&documentName=" + event.getSummary().getName(),
+		// "_blank", "");
 	}
-		
+
 	public void onDocumentsParentSelectionEvent(
 			@Observes DocumentsParentSearchEvent event) {
-		if (currentCMSContentSummary != null){
-			if (currentCMSContentSummary.getParent() != null){
-				this.refreshDocumentList(currentCMSContentSummary.getParent().getId());
+		if (currentCMSContentSummary != null) {
+			if (currentCMSContentSummary.getParent() != null) {
+				this.refreshDocumentList(currentCMSContentSummary.getParent()
+						.getId());
 			} else {
 				this.refreshDocumentList(null);
 			}
-		}	
+		}
 	}
-	
-	public void onDocumentRemoveEvent(
-			@Observes DocumentRemoveSearchEvent event) {
+
+	public void onDocumentRemoveEvent(@Observes DocumentRemoveSearchEvent event) {
 		this.dataServices.call(new RemoteCallback<Void>() {
 			@Override
 			public void callback(Void response) {
@@ -224,9 +242,8 @@ public class DocumentListPresenter {
 			}
 		}).removeDocument(event.getSummary().getId());
 	}
-	
-	public void onDocumentAddedEvent(
-			@Observes NewDocumentEvent event) {
+
+	public void onDocumentAddedEvent(@Observes NewDocumentEvent event) {
 		refreshDocumentList(currentCMSContentSummary.getId());
 	}
 }

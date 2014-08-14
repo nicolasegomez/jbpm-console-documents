@@ -30,8 +30,8 @@ import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentRemoveSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
-import org.jbpm.console.ng.gc.client.util.ResizableHeader;
-import org.uberfire.client.common.BusyPopup;
+import org.kie.uberfire.client.common.BusyPopup;
+import org.kie.uberfire.client.tables.ResizableHeader;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.security.Identity;
@@ -257,7 +257,7 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 					}
 				});
 
-		processdefListGrid.addColumn(processNameColumn, new ResizableHeader(
+		processdefListGrid.addColumn(processNameColumn, new ResizableHeader<CMSContentSummary>(
 				"Name", processdefListGrid, processNameColumn));
 
 		// Version Type

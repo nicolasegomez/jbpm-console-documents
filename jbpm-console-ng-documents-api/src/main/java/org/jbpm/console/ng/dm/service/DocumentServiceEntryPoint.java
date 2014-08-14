@@ -1,6 +1,7 @@
 package org.jbpm.console.ng.dm.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.errai.bus.server.annotations.Remote;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
@@ -18,6 +19,10 @@ public interface DocumentServiceEntryPoint {
 	
 
 	void addDocument(DocumentSummary doc);
+	
+	Map<String,String> getConfigurationParameters();
+	
+	Long setConfigurationParameters(Map<String,String> parameters);
 
 
 }

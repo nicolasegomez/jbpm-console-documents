@@ -26,16 +26,15 @@ import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jbpm.console.ng.dm.client.i18n.Constants;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentDefSelectionEvent;
 import org.jbpm.console.ng.dm.service.DocumentServiceEntryPoint;
-import org.jbpm.console.ng.dm.client.i18n.Constants;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.common.popups.errors.ErrorPopup;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.split.WorkbenchSplitLayoutPanel;
@@ -46,9 +45,9 @@ import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.Menus;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
-import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 
 @Dependent
@@ -129,7 +128,7 @@ public class DocumentDetailsPresenter {
 		}, new ErrorCallback<Message>() {
 			@Override
 			public boolean error(Message message, Throwable throwable) {
-				ErrorPopup.showMessage("Unexpected error encountered : "
+				org.kie.uberfire.client.common.popups.errors.ErrorPopup.showMessage("Unexpected error encountered : "
 						+ throwable.getMessage());
 				return true;
 			}

@@ -16,10 +16,8 @@
 package org.jbpm.console.ng.dm.client.perspectives;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.jbpm.console.ng.ht.model.events.SearchEvent;
 import org.kie.workbench.common.widgets.client.search.ContextualSearch;
 import org.kie.workbench.common.widgets.client.search.SearchBehavior;
 import org.uberfire.client.annotations.Perspective;
@@ -42,9 +40,6 @@ public class DocumentsListPerspective {
     @Inject
     private ContextualSearch contextualSearch;
     
-    @Inject
-    private Event<SearchEvent> searchEvents;
-    
     @Perspective
     public PerspectiveDefinition getPerspective() {
         final PerspectiveDefinition p = new PerspectiveDefinitionImpl(PanelType.ROOT_LIST);
@@ -62,7 +57,7 @@ public class DocumentsListPerspective {
         contextualSearch.setSearchBehavior(new SearchBehavior() {
             @Override
             public void execute(String searchFilter) {
-                searchEvents.fire(new SearchEvent(searchFilter));
+                //searchEvents.fire(new SearchEvent(searchFilter));
             }
 
         });

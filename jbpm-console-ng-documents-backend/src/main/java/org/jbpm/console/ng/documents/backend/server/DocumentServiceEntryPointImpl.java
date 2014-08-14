@@ -1,6 +1,7 @@
 package org.jbpm.console.ng.documents.backend.server;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -37,4 +38,17 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 		doc.setContent("test".getBytes());
 		this.documentService.createDocument(doc);
 	}
+	
+	@Override
+	public Map<String, String> getConfigurationParameters() {
+		return documentService.getConfigurationParameters();
+	}
+	
+	@Override
+	public Long setConfigurationParameters(Map<String, String> parameters) {
+		documentService.setConfigurationParameters(parameters);
+		return 0l;
+		
+	}
+
 }
