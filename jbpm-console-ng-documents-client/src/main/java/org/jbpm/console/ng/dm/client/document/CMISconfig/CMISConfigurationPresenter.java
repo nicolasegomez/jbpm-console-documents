@@ -88,6 +88,8 @@ public class CMISConfigurationPresenter {
 		void displayNotification(String text);
 
 		Button getConfigureButton();
+		
+		Button getTestButton();
 
 	}
 
@@ -146,7 +148,7 @@ public class CMISConfigurationPresenter {
 				view.getWSMultifilingTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE));
 				view.getWSNavigationTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE));
 				view.getWSObjectTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_OBJECT_SERVICE));
-				view.getWSPolicyTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_POLICY_SERVICE_ENDPOINT));
+				view.getWSPolicyTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_POLICY_SERVICE));
 				view.getWSRelationshipTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE));
 				view.getWSRepositoryTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE));
 				view.getWSVersioningTextBox().setText(parameters.get(SessionParameter.WEBSERVICES_VERSIONING_SERVICE));
@@ -204,6 +206,30 @@ public class CMISConfigurationPresenter {
             }
         }).setConfigurationParameters(parameters);
 	}
+	
+	public void testConnection(){
+		dataServices.call(new RemoteCallback<Boolean>() {
+            @Override
+            public void callback(Boolean result) {
+                if (result){
+                	view.displayNotification("Connection Successfull");
+                } else {
+                	view.displayNotification("Connection Failed");
+                }
+                
+                	
+            	
+            	
+            }
+        }, new ErrorCallback<Message>() {
+            @Override
+            public boolean error(Message message, Throwable throwable) {
+                ErrorPopup.showMessage("Unexpected error encountered : " + throwable.getMessage());
+                return true;
+            }
+        }).testConnection();
+		
+	}
 
 	@WorkbenchMenu
 	public Menus getMenus() {
@@ -223,43 +249,6 @@ public class CMISConfigurationPresenter {
 	}
 
 	private List<MenuItem> getOptions() {
-		// List<MenuItem> menuItems = new ArrayList<MenuItem>(2);
-		//
-		// menuItems.add( MenuFactory.newSimpleItem(
-		// constants.View_Process_Model()).respondsWith( new Command() {
-		// @Override
-		// public void execute() {
-		// PlaceRequest placeRequestImpl = new DefaultPlaceRequest( "Designer"
-		// );
-		//
-		// // if ( view.getEncodedProcessSource() != null ) {
-		// placeRequestImpl.addParameter( "readOnly", "true" );
-		// //placeRequestImpl.addParameter( "encodedProcessSource",
-		// view.getEncodedProcessSource() );
-		// placeRequestImpl.addParameter("processId",
-		// view.getProcessIdText().getText());
-		// placeRequestImpl.addParameter("deploymentId",
-		// view.getDeploymentIdText().getText());
-		//
-		// //}
-		// placeManager.goTo( view.getProcessAssetPath(), placeRequestImpl );
-		// }
-		// } ).endMenu().build().getItems().get( 0 ) );
-		//
-		// menuItems.add( MenuFactory.newSimpleItem(
-		// constants.View_Process_Instances()).respondsWith( new Command() {
-		// @Override
-		// public void execute() {
-		// PlaceRequest placeRequestImpl = new DefaultPlaceRequest(
-		// "Process Instances" );
-		// placeRequestImpl.addParameter( "processName",
-		// view.getProcessNameText().getText() );
-		// placeManager.goTo( placeRequestImpl );
-		// }
-		// } ).endMenu().build().getItems().get( 0 ) );
-		//
-		//
-		// return menuItems;
 		return null;
 	}
 

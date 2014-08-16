@@ -48,6 +48,9 @@ public class CMISConfigurationViewImpl extends Composite implements
 	private CMISConfigurationPresenter presenter;
 	
 	private Constants constants = GWT.create(Constants.class);
+	
+	@Inject
+	private Event<NotificationEvent> notification;
 
 	@Inject
     @DataField
@@ -152,6 +155,10 @@ public class CMISConfigurationViewImpl extends Composite implements
     @Inject
     @DataField
     public Button configureButton;
+    
+    @Inject
+    @DataField
+    public Button testButton;
 
 	@Override
 	public void init(final CMISConfigurationPresenter presenter) {
@@ -172,25 +179,30 @@ public class CMISConfigurationViewImpl extends Composite implements
         passwordLabel.setText("Password");
          
         
-        configureButton.setText("Configure");
+        configureButton.setText("Save");
+        testButton.setText("Test Connection");
 	}
 
 	@Override
 	public void displayNotification(String text) {
-		// TODO Auto-generated method stub
+		notification.fire(new NotificationEvent(text));
 
 	}
 
-	@Override
-	public TextBox getWSACLTextBox() {
-		return webServicesACLBox;
-	}
-
-		
 	@EventHandler("configureButton")
     public void configureButton( ClickEvent e ) {
         presenter.configureParameters();
     }
+	
+	@EventHandler("testButton")
+    public void testButton( ClickEvent e ) {
+        presenter.testConnection();
+    }
+	
+	@Override
+	public TextBox getWSACLTextBox() {
+		return webServicesACLBox;
+	}
 
 	@Override
 	public TextBox getWSDiscoveryTextBox() {
@@ -250,6 +262,11 @@ public class CMISConfigurationViewImpl extends Composite implements
 	@Override
 	public Button getConfigureButton() {
 		return configureButton;
+	}
+	
+	@Override
+	public Button getTestButton() {
+		return testButton;
 	}
 
 }

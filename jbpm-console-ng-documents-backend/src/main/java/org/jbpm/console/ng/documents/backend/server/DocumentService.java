@@ -22,4 +22,6 @@ public interface DocumentService {
 	Map<String,String> getConfigurationParameters();
 	
 	void setConfigurationParameters(Map<String,String> parameters);
+	
+	Boolean testConnection();
 }

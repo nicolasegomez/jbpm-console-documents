@@ -88,71 +88,93 @@ public class DocumentServiceCMISImpl implements DocumentService {
 				SunRIPortProvider.class.getName());
 
 	}
-	
+
 	@Override
-	public Map<String,String> getConfigurationParameters(){
+	public Map<String, String> getConfigurationParameters() {
 		return parameters;
 	}
-	
+
 	@Override
-	public void setConfigurationParameters(Map<String,String> parameters){
-		this. parameters = parameters;
+	public void setConfigurationParameters(Map<String, String> parameters) {
+		parameters.put(SessionParameter.BINDING_TYPE,
+				BindingType.WEBSERVICES.value());
+		parameters.put(SessionParameter.WEBSERVICES_PORT_PROVIDER_CLASS,
+				SunRIPortProvider.class.getName());
+		this.parameters = parameters;
+		
+		createSession();
+
+	}
+
+	private Session getSession() {
+		if (session == null) {
+			session = createSession();
+		}
+		return session;
 	}
 
 	private Session createSession() {
-		SessionFactory factory = SessionFactoryImpl.newInstance();
-		
-		// create session
-		Session session = factory.createSession(parameters);
+		try {
+			SessionFactory factory = SessionFactoryImpl.newInstance();
+
+			// create session
+			session = factory.createSession(parameters);
+		} catch (Exception e) {
+			session = null;
+		}
 		return session;
 	}
 
 	@Override
 	public List<CMSContentSummary> getChildren(String id) {
-		if (session == null) {
-			session = this.createSession();
+		Session session = getSession();
+		if (session != null) {
+			Folder folder = null;
+			if (id == null || id.isEmpty()) {
+				folder = session.getRootFolder();
+			} else {
+				folder = (Folder) session.getObject(id);
+			}
+			ItemIterable<CmisObject> children = folder.getChildren();
+			Iterator<CmisObject> childrenItems = children.iterator();
+			List<CmisObject> documents = new ArrayList<CmisObject>();
+			while (childrenItems.hasNext()) {
+				CmisObject item = childrenItems.next();
+				documents.add(item);
+			}
+			return this.transform(documents);
 		}
-		Folder folder = null;
-		if (id == null || id.isEmpty()) {
-			folder = session.getRootFolder();
-		} else {
-			folder = (Folder) session.getObject(id);
-		}
-		ItemIterable<CmisObject> children = folder.getChildren();
-		Iterator<CmisObject> childrenItems = children.iterator();
-		List<CmisObject> documents = new ArrayList<CmisObject>();
-		while (childrenItems.hasNext()) {
-			CmisObject item = childrenItems.next();
-			documents.add(item);
-		}
-		return this.transform(documents);
+		return new ArrayList<CMSContentSummary> ();
 	}
 
 	@Override
 	public InputStream getDocumentContent(String id) {
-		Session session = this.createSession();
-		if (id == null || id.isEmpty()) {
-			throw new IllegalArgumentException("No id provided");
+		Session session = getSession();
+		if (session != null) {
+			if (id == null || id.isEmpty()) {
+				throw new IllegalArgumentException("No id provided");
+			}
+			Document document = (Document) session.getObject(id);
+			if (document == null) {
+				throw new IllegalArgumentException(
+						"Document with this id does not exist");
+			}
+			return document.getContentStream().getStream();
 		}
-		Document document = (Document) session.getObject(id);
-		if (document == null) {
-			throw new IllegalArgumentException(
-					"Document with this id does not exist");
-		}
-		return document.getContentStream().getStream();
+		return null;
 	}
 
 	@Override
 	public void removeDocument(final String id) {
-		if (session == null) {
-			session = this.createSession();
+		Session session = getSession();
+		if (session != null) {
+			session.delete(new ObjectId() {
+				@Override
+				public String getId() {
+					return id;
+				}
+			});
 		}
-		session.delete(new ObjectId() {
-			@Override
-			public String getId() {
-				return id;
-			}
-		});
 	}
 
 	public List<CMSContentSummary> transform(List<CmisObject> children) {
@@ -193,31 +215,46 @@ public class DocumentServiceCMISImpl implements DocumentService {
 
 	@Override
 	public CMSContentSummary getDocument(String id) {
-		if (session == null) {
-			session = this.createSession();
+		Session session = getSession();
+
+		if (session != null) {
+			Document document = null;
+			if (id != null && !id.isEmpty()) {
+				document = (Document) session.getObject(id);
+			}
+
+			return this.transform(document);
 		}
 
-		Document document = null;
-		if (id != null && !id.isEmpty()) {
-			document = (Document) session.getObject(id);
-		}
-
-		return this.transform(document);
+		return new DocumentSummary();
 	}
 
 	@Override
 	public void createDocument(DocumentSummary doc) {
-		if (session == null) {
-			session = this.createSession();
+		Session session = getSession();
+		if (session != null) {
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+			properties.put(PropertyIds.NAME, doc.getName());
+			InputStream stream = new ByteArrayInputStream(doc.getContent());
+			ContentStream contentStream = new ContentStreamImpl(doc.getName(),
+					BigInteger.valueOf(doc.getContent().length),
+					MimeTypes.getMIMEType(doc.getName()), stream);
+			((Folder) session.getObjectByPath(doc.getPath())).createDocument(
+					properties, contentStream, VersioningState.NONE);
 		}
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
-		properties.put(PropertyIds.NAME, doc.getName());
-		InputStream stream = new ByteArrayInputStream(doc.getContent());
-		ContentStream contentStream = new ContentStreamImpl(doc.getName(),
-				BigInteger.valueOf(doc.getContent().length),
-				MimeTypes.getMIMEType(doc.getName()), stream);
-		((Folder) this.session.getObjectByPath(doc.getPath())).createDocument(
-				properties, contentStream, VersioningState.NONE);
+	}
+
+	@Override
+	public Boolean testConnection() {
+		Session session = getSession();
+
+		if (session != null) {
+			if (session.getRootFolder() != null) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

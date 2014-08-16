@@ -51,4 +51,9 @@ public class DocumentServiceEntryPointImpl implements DocumentServiceEntryPoint 
 		
 	}
 
+	@Override
+	public Boolean testConnection() {
+		return documentService.testConnection();
+	}
+
 }

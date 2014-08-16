@@ -122,9 +122,11 @@ public class DocumentListPresenter {
 			@Override
 			public void callback(List<CMSContentSummary> documents) {
 				currentDocuments = documents;
-				CMSContentSummary first = documents.get(0);
-				if (first != null) {
-					currentCMSContentSummary = first.getParent();
+				if (documents.size() > 0) {
+					CMSContentSummary first = documents.get(0);
+					if (first != null) {
+						currentCMSContentSummary = first.getParent();
+					}
 				}
 				filterProcessList(view.getCurrentFilter());
 			}

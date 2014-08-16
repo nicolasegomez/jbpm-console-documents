@@ -23,6 +23,8 @@ public interface DocumentServiceEntryPoint {
 	Map<String,String> getConfigurationParameters();
 	
 	Long setConfigurationParameters(Map<String,String> parameters);
+	
+	Boolean testConnection();
 
 
 }
