@@ -28,6 +28,10 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.console.ng.dm.model.CMSContentSummary;
 import org.jbpm.console.ng.dm.model.events.DocumentRemoveSearchEvent;
+<<<<<<< HEAD
+import org.jbpm.console.ng.dm.model.events.DocumentsHomeSearchEvent;
+=======
+>>>>>>> 8263f9d4750445cdeebbdf2df5e28ac67f8f1e91
 import org.jbpm.console.ng.dm.model.events.DocumentsListSearchEvent;
 import org.jbpm.console.ng.dm.model.events.DocumentsParentSearchEvent;
 import org.kie.uberfire.client.common.BusyPopup;
@@ -110,6 +114,12 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 
 	@Inject
 	private Event<DocumentsParentSearchEvent> parentDocEvent;
+<<<<<<< HEAD
+	
+	@Inject
+	private Event<DocumentsHomeSearchEvent> homeDocEvent;
+=======
+>>>>>>> 8263f9d4750445cdeebbdf2df5e28ac67f8f1e91
 
 	@Inject
 	private Event<DocumentRemoveSearchEvent> removeDocEvent;
@@ -168,7 +178,17 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 		homeLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+<<<<<<< HEAD
+				parentLink.setStyleName("active");
+
+				if (BrowserEvents.CLICK.equalsIgnoreCase(event.getNativeEvent()
+						.getType())) {
+					parentDocEvent.fire(new DocumentsParentSearchEvent());
+					parentLink.setStyleName("");
+				}
+=======
 				// TODO
+>>>>>>> 8263f9d4750445cdeebbdf2df5e28ac67f8f1e91
 			}
 		});
 
@@ -347,4 +367,18 @@ public class DocumentListViewImpl extends ActionsCellDocuments implements
 		BusyPopup.close();
 	}
 
+<<<<<<< HEAD
+	@Override
+	public void updatePathLink() {
+		String path = presenter.currentCMSContentSummary.getPath();
+		if (path != null && !path.equals("")) { 
+			pathLink.setText(path);
+		} else
+		{
+			pathLink.setText("/");
+		}
+	}
+
+=======
+>>>>>>> 8263f9d4750445cdeebbdf2df5e28ac67f8f1e91
 }

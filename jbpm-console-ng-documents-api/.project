@@ -2,6 +2,7 @@
   <name>jbpm-console-ng-documents-api</name>
   <comment>jBPM Console NG Modules. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
+    <project>jbpm-console-ng-generic-api</project>
     <project>jbpm-console-ng-human-tasks-api</project>
   </projects>
   <buildSpec>

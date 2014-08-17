@@ -42,8 +42,8 @@ public class DocumentServiceCMISImpl implements DocumentService {
 
 	private Session session;
 
-	@PostConstruct
-	private void init() {
+	@Override
+	public void init() {
 		parameters = new HashMap<String, String>();
 		String webServicesACLServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ACLService?wsdl";
 		String webServicesDiscoveryServices = "http://localhost:8080/cmis/services/DiscoveryService?wsdl";
@@ -57,6 +57,7 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		String repositoryID = "dms";
 		String user = "superuser";
 		String password = "superuser";
+
 
 		// user credentials
 		parameters.put(SessionParameter.USER, "superuser");
@@ -101,7 +102,6 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		parameters.put(SessionParameter.WEBSERVICES_PORT_PROVIDER_CLASS,
 				SunRIPortProvider.class.getName());
 		this.parameters = parameters;
-		
 		createSession();
 
 	}
@@ -142,9 +142,9 @@ public class DocumentServiceCMISImpl implements DocumentService {
 				CmisObject item = childrenItems.next();
 				documents.add(item);
 			}
-			return this.transform(documents);
+			return this.transform(documents, folder);
 		}
-		return new ArrayList<CMSContentSummary> ();
+		return new ArrayList<CMSContentSummary>();
 	}
 
 	@Override
@@ -177,15 +177,16 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		}
 	}
 
-	public List<CMSContentSummary> transform(List<CmisObject> children) {
+	public List<CMSContentSummary> transform(List<CmisObject> children,
+			Folder folder) {
 		List<CMSContentSummary> documents = new ArrayList<CMSContentSummary>();
 		for (CmisObject item : children) {
-			documents.add(transform(item));
+			documents.add(transform(item, folder));
 		}
 		return documents;
 	}
 
-	public CMSContentSummary transform(CmisObject object) {
+	public CMSContentSummary transform(CmisObject object, Folder parentFolder) {
 		CMSContentSummary doc = null;
 		if (((ObjectType) object.getType()).getId().equals("cmis:folder")) {
 			Folder folder = (Folder) object;
@@ -196,8 +197,15 @@ public class DocumentServiceCMISImpl implements DocumentService {
 																	// only has
 																	// one
 																	// parent.
-			doc.setParent(new FolderSummary(parent.getName(), parent.getId(),
-					parent.getPath()));
+			FolderSummary parentFolderSummary = new FolderSummary(
+					parent.getName(), parent.getId(), parent.getPath());
+			if (parentFolder != null && parentFolder.getParents().size() > 0) {
+				Folder grandParent = parentFolder.getParents().get(0);
+				parentFolderSummary
+						.setParent(new FolderSummary(grandParent.getName(),
+								grandParent.getId(), grandParent.getPath()));
+			}
+			doc.setParent(parentFolderSummary);
 		} else {
 			doc = new DocumentSummary(object.getName(), object.getId(), null);
 			Folder parent = ((Document) object).getParents().get(0); // for now,
@@ -207,8 +215,15 @@ public class DocumentServiceCMISImpl implements DocumentService {
 																		// has
 																		// one
 																		// parent.
-			doc.setParent(new FolderSummary(parent.getName(), parent.getId(),
-					parent.getPath()));
+			FolderSummary parentFolderSummary = new FolderSummary(
+					parent.getName(), parent.getId(), parent.getPath());
+			if (parentFolder != null && parentFolder.getParents().size() > 0) {
+				Folder grandParent = parentFolder.getParents().get(0);
+				parentFolderSummary
+						.setParent(new FolderSummary(grandParent.getName(),
+								grandParent.getId(), grandParent.getPath()));
+			}
+			doc.setParent(parentFolderSummary);
 		}
 		return doc;
 	}
@@ -223,7 +238,12 @@ public class DocumentServiceCMISImpl implements DocumentService {
 				document = (Document) session.getObject(id);
 			}
 
-			return this.transform(document);
+			if (document.getParents() != null
+					&& document.getParents().size() > 0) {
+				return this.transform(document, document.getParents().get(0));
+			} else {
+				return this.transform(document, null);
+			}
 		}
 
 		return new DocumentSummary();
@@ -240,9 +260,11 @@ public class DocumentServiceCMISImpl implements DocumentService {
 			ContentStream contentStream = new ContentStreamImpl(doc.getName(),
 					BigInteger.valueOf(doc.getContent().length),
 					MimeTypes.getMIMEType(doc.getName()), stream);
-			((Folder) session.getObjectByPath(doc.getPath())).createDocument(
+			Document createdDoc = ((Folder) session.getObjectByPath(doc.getPath())).createDocument(
 					properties, contentStream, VersioningState.NONE);
+			doc.setId(createdDoc.getId());
 		}
+		throw new IllegalStateException("Could not get CMIS session");
 	}
 
 	@Override
