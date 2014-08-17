@@ -43,7 +43,8 @@ public class DocumentServiceCMISImpl implements DocumentService {
 	private Session session;
 
 	@PostConstruct
-	private void init() {
+	@Override
+	public void init() {
 		parameters = new HashMap<String, String>();
 		String webServicesACLServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/ACLService?wsdl";
 		String webServicesDiscoveryServices = "http://localhost:8080/cmis/services/DiscoveryService?wsdl";
@@ -55,8 +56,6 @@ public class DocumentServiceCMISImpl implements DocumentService {
 		String webServicesRepositoryServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/RepositoryService?wsdl";
 		String webServicesVersioningServices = "http://localhost:8080/magnoliaAuthor/.magnolia/cmisws/VersioningService?wsdl";
 		String repositoryID = "dms";
-		String user = "superuser";
-		String password = "superuser";
 
 		// user credentials
 		parameters.put(SessionParameter.USER, "superuser");
